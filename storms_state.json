@@ -1,0 +1,84 @@
+{
+ "as_of": "2026-07-10",
+ "n_storms": 1,
+ "storms": [
+  {
+   "slug": "reflation-evolution",
+   "name": "Еволюция на рефлацията",
+   "says": "Режимът Рефлация стои, но основите му се изместват — лещите, подкрепата и цените говорят за еволюция към нещо друго.",
+   "born": "2026-07-12",
+   "status": "active",
+   "as_of": "2026-07-10",
+   "age_days": 0,
+   "n_hold": 5,
+   "n_total": 5,
+   "conditions": [
+    {
+     "id": "c1",
+     "voice": "S6c пазарен режим (Б)",
+     "label": "Режимът е Рефлация",
+     "field": "regime.current",
+     "test": "== REFLATION",
+     "core": true,
+     "link": "vrm.html",
+     "lies_when": "режимът се потвърждава с лаг — смяна се вижда 1-2 седмици по-късно",
+     "holds": true
+    },
+    {
+     "id": "c2",
+     "voice": "възелът пазар↔лещи (Б)",
+     "label": "≥2 от 3 макро лещи в не-рефлационен етикет",
+     "field": "lenses.non_reflation_count",
+     "test": ">= 2",
+     "core": true,
+     "link": "https://tsvetoslavtsachev.github.io/macro-web-dashboard/",
+     "lies_when": "лещите са агрегати — етикет може да мигне при ревизия на данните",
+     "holds": true
+    },
+    {
+     "id": "c3",
+     "voice": "възрастта на режима (А)",
+     "label": "Възраст над медианата (13с) за Рефлация",
+     "field": "regime.age_weeks",
+     "test": "> 13",
+     "core": false,
+     "link": "vrm.html",
+     "lies_when": "възрастта сама не убива — две рефлации живяха 61 и 82 седмици",
+     "holds": true
+    },
+    {
+     "id": "c4",
+     "voice": "подкрепата — гласовете (А)",
+     "label": "≤2 твърди поддръжника (≥80% консистентност, 13с)",
+     "field": "votes.firm_count",
+     "test": "<= 2",
+     "core": false,
+     "link": "vrm.html",
+     "lies_when": "прагът 80% е остър — глас на 79% и глас на 30% се броят еднакво",
+     "holds": true
+    },
+    {
+     "id": "c5",
+     "voice": "КАИШКАТА — вътрешен разнобой (А)",
+     "label": "Разнобой множители↔обещания ≥4σ",
+     "field": "hype.divergence_sigma",
+     "test": ">= 4.0",
+     "core": false,
+     "link": "https://tsvetoslavtsachev.github.io/ai-hype-monitor/",
+     "lies_when": "данните дишат със SEC-ритъма (~45д лаг) — числото застоява между подавания",
+     "holds": true
+    }
+   ],
+   "falsifier": "Режимът се сменя (c1 пада 2 поредни съботи) ИЛИ ≥2 лещи се изравнят с рефлацията ИЛИ подкрепата се разшири до ≥4 твърди гласа.",
+   "down_streak": {
+    "c1": 0,
+    "c2": 0
+   },
+   "baseline_down_streak": {
+    "c1": 0,
+    "c2": 0
+   },
+   "baseline_status": null
+  }
+ ]
+}

@@ -1,0 +1,255 @@
+<!doctype html><html lang="bg"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>СЪБОТНИЯТ ЕКРАН · v2 МАКЕТ</title>
+<style>
+:root{--srf:#1a1a19;--pg:#0d0d0d;--ink:#fff;--ink2:#c3c2b7;--mut:#898781;--grid:#2c2c2a;
+--ax:#383835;--up:#0ca30c;--dn:#d03b3b;--warn:#fab219;--ring:rgba(255,255,255,.1)}
+*{box-sizing:border-box}body{margin:0;background:var(--pg);color:var(--ink);
+font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:20px}
+.wrap{max-width:1060px;margin:0 auto}
+h1{font-size:19px;margin:0 0 2px}.sub{color:var(--ink2);font-size:13px;margin-bottom:16px}
+.mock{border:1px dashed var(--warn);color:var(--warn);border-radius:9px;padding:1px 8px;font-size:12px;margin-left:8px}
+.tag{border:1px solid var(--ring);color:var(--mut);border-radius:9px;padding:1px 8px;font-size:11.5px;margin-left:6px}
+.floor{background:var(--srf);border:1px solid var(--ring);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.fh{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.fh .n{color:var(--mut);font-size:11px;letter-spacing:1px}
+.fh .t{font-weight:700;font-size:15px}
+.fh .d{color:var(--mut);font-size:12px;margin-left:auto;cursor:help}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.chip{border:1px solid var(--ring);border-radius:9px;padding:6px 12px;font-size:13px}
+.chip b{display:block;font-size:11px;color:var(--mut);font-weight:600;letter-spacing:.4px}
+.row{display:grid;grid-template-columns:210px 1fr 150px;gap:12px;align-items:center;padding:4px 0;border-bottom:1px solid var(--grid)}
+.row:last-child{border-bottom:none}
+.nm{white-space:nowrap;font-size:13px}.nm .t{font-weight:700;margin-right:6px}
+.track{position:relative;height:16px;background:#151514;border-radius:8px;cursor:help}
+.zero{position:absolute;top:0;bottom:0;width:1px;background:var(--ax)}
+.mark{position:absolute;top:0;bottom:0;width:1px;background:var(--mut)}
+.range{position:absolute;top:5px;height:6px;border-radius:4px;opacity:.55}
+.range.up{background:var(--up)}.range.dn{background:var(--dn)}.range.warn{background:var(--warn)}
+.dot{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px var(--srf)}
+.dot.up{background:var(--up)}.dot.dn{background:var(--dn)}.dot.warn{background:var(--warn)}.dot.neu{background:#c3c2b7}
+.v{font-variant-numeric:tabular-nums;font-size:13px;white-space:nowrap}
+.b{font-weight:650}.b.up{color:var(--up)}.b.dn{color:var(--dn)}.b.warn{color:var(--warn)}
+.small{color:var(--mut);font-size:11.5px}
+.badge{border-radius:8px;padding:0 7px;font-size:11.5px;border:1px solid var(--ring);color:var(--ink2)}
+.badge.firm{color:var(--up);border-color:var(--up)}
+.badge.against{color:var(--dn);border-color:var(--dn)}
+.badge.swing{color:var(--warn);border-color:var(--warn)}
+.slot{border:1px dashed var(--ax);border-radius:9px;padding:8px 12px;color:var(--mut);font-size:12.5px}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.scard{border:1px solid var(--ring);border-radius:10px;padding:10px 12px}
+.scard h3{margin:0 0 6px;font-size:14px}
+.scard .meta{color:var(--mut);font-size:11.5px;margin-top:6px}
+.cand{display:flex;gap:8px;align-items:center;padding:3px 0;font-size:13px}
+.cand .t{font-weight:700;width:46px}
+.rank{flex:1;position:relative;height:10px;background:#151514;border-radius:5px}
+.rank .fill{position:absolute;top:2px;bottom:2px;left:0;background:var(--up);opacity:.55;border-radius:4px}
+.rank .dt{position:absolute;top:50%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--up);box-shadow:0 0 0 2px var(--srf)}
+.foot{color:var(--mut);font-size:11.5px;margin-top:6px}
+.lens4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.lcard{border:1px solid var(--ring);border-radius:12px;padding:12px 14px;cursor:pointer;background:#151514;transition:border-color .15s}
+.lcard:hover{border-color:var(--warn)}
+.lcard.open{border-color:var(--warn)}
+.lcard .rg{font-size:15px;font-weight:700;margin:2px 0 1px}
+.lcard .reg{color:var(--mut);font-size:10.5px;letter-spacing:.8px}
+.lcard .as{color:var(--mut);font-size:11px}
+.mini{display:flex;gap:4px;margin-top:8px}
+.mini .m{flex:1;position:relative;height:22px;background:#0f0f0e;border-radius:4px}
+.mini .m i{position:absolute;left:0;bottom:0;top:auto;width:100%;border-radius:4px;background:var(--ink2);opacity:.35}
+.mini .m b{position:absolute;left:0;right:0;bottom:2px;text-align:center;font-size:9px;color:var(--mut);font-weight:600}
+.dvg{display:inline-block;margin-top:8px;border:1px solid var(--ring);border-radius:8px;padding:0 7px;font-size:11px;color:var(--warn)}
+.drawer{display:none;border:1px solid var(--warn);border-radius:12px;padding:14px 16px;margin-top:10px;background:#151514}
+.drawer.on{display:block}
+.drawer h4{margin:10px 0 6px;font-size:12px;color:var(--mut);letter-spacing:.5px;text-transform:uppercase}
+.drawer h4:first-child{margin-top:0}
+.brief{color:var(--ink2);font-size:13px;border-left:2px solid var(--ax);padding-left:10px;margin:4px 0}
+.dlink{color:var(--warn);font-size:12px;text-decoration:none}
+</style></head><body><div class="wrap">
+
+<h1>СЪБОТНИЯТ ЕКРАН <span class="mock">v2 МАКЕТ — за одобрение на подредбата</span><span class="tag">[ВЪТРЕШЕН ПОГЛЕД]</span></h1>
+<div class="sub">W28 · 06–10.07.2026 · веригата: икономика → режим → гласове → пазар → сектор → имена ·
+един език навсякъде: „къде в собствения си диапазон"</div>
+
+<!-- ЕТАЖ 0 -->
+<div class="floor">
+<div class="fh"><span class="n">ЕТАЖ 0</span><span class="t">Икономиката — четирите лещи (клик за чекмеджето)</span>
+<span class="d" title="Лицето: режим + под-лещите (0-100) + брой вътрешни дивергенции. Кликът отваря ЦЯЛАТА дъска на региона: всички под-лещи · ВСИЧКИ аномалии (за И против) · седмичния брифинг · линк към пълния дашборд.">ⓘ какво е това</span></div>
+<div class="lens4">
+<div class="lcard" onclick="dr('vrm',this)"><div class="reg">VRM · до 31.05 (месечен)</div><div class="rg">РЕФЛАЦИЯ</div>
+<div class="mini"><span class="m" title="alignment 6/8"><i style="height:75%"></i><b>6/8</b></span><span class="m" title="KS неактивен"><i style="height:15%"></i><b>KS</b></span><span class="m" title="GMS 4/8"><i style="height:50%"></i><b>GMS</b></span></div>
+<span class="dvg">гласовете → етаж 2</span></div>
+<div class="lcard" onclick="dr('us',this)"><div class="reg">САЩ · до 04.07</div><div class="rg">Стагфлация (потв.)</div>
+<div class="mini"><span class="m" title="труд 35.5"><i style="height:35%"></i><b>ТР</b></span><span class="m" title="растеж 41.6"><i style="height:42%"></i><b>РА</b></span><span class="m" title="инфлация 36.3"><i style="height:36%"></i><b>ИН</b></span><span class="m" title="ликвидност 51.1"><i style="height:51%"></i><b>ЛИ</b></span></div>
+<span class="dvg">6 дивергенции</span></div>
+<div class="lcard" onclick="dr('eu',this)"><div class="reg">ЕВРОЗОНА · до 04.07</div><div class="rg">Дезинфлация</div>
+<div class="mini"><span class="m" title="труд 34.7"><i style="height:35%"></i><b>ТР</b></span><span class="m" title="растеж 37.8"><i style="height:38%"></i><b>РА</b></span><span class="m" title="инфлация 50.7"><i style="height:51%"></i><b>ИН</b></span><span class="m" title="кредит 44.7"><i style="height:45%"></i><b>КР</b></span><span class="m" title="външна 20.2"><i style="height:20%"></i><b>ВЪ</b></span></div>
+<span class="dvg">7 дивергенции</span></div>
+<div class="lcard" onclick="dr('cn',this)"><div class="reg">КИТАЙ · до 08.07</div><div class="rg">ВЛОШАВАЩ СЕ · 40.1</div>
+<div class="mini"><span class="m" title="растеж 44.5"><i style="height:45%"></i><b>РА</b></span><span class="m" title="инфлация 48.0"><i style="height:48%"></i><b>ИН</b></span><span class="m" title="труд 18.6"><i style="height:19%"></i><b>ТР</b></span><span class="m" title="кредит 52.3"><i style="height:52%"></i><b>КР</b></span><span class="m" title="имоти 23.2"><i style="height:23%"></i><b>ИМ</b></span></div>
+<span class="dvg">3 дивергенции</span></div>
+</div>
+
+<div class="drawer" id="dr-us">
+<h4>Под-лещите (0-100 · семантиката на скалата се сверява от репото — уговорка №2)</h4>
+<div class="row"><span class="nm">Труд</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:35.5%"></div></div><span class="v">35.5</span></div>
+<div class="row"><span class="nm">Растеж</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:41.6%"></div></div><span class="v">41.6</span></div>
+<div class="row"><span class="nm">Инфлация</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:36.3%"></div></div><span class="v">36.3</span></div>
+<div class="row"><span class="nm">Ликвидност</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:51.1%"></div></div><span class="v">51.1</span></div>
+<h4>Упоритите аномалии — всичките, за И против</h4>
+<div class="row"><span class="nm">PPI Final Demand <span class="small">7 седм.</span></span><div class="track"><div class="zero" style="left:50%"></div><div class="dot warn" style="left:96%"></div></div><span class="v"><span class="b warn">|z| 2.8</span></span></div>
+<div class="row"><span class="nm">CPI стоки <span class="small">7 седм.</span></span><div class="track"><div class="zero" style="left:50%"></div><div class="dot warn" style="left:90%"></div></div><span class="v"><span class="b warn">|z| 2.4</span></span></div>
+<div class="row"><span class="nm">Labor share <span class="small">НОВ екстремум</span></span><div class="track"><div class="zero" style="left:50%"></div><div class="dot warn" style="left:89%"></div></div><span class="v"><span class="b warn">|z| 2.3</span></span></div>
+<div class="row"><span class="nm">Michigan инфл. очаквания <span class="small">7 седм.</span></span><div class="track"><div class="zero" style="left:50%"></div><div class="dot warn" style="left:89%"></div></div><span class="v"><span class="b warn">|z| 2.3</span></span></div>
+<div class="foot">…и още 6 (в реалния билд: всичките 10, с посока +/− от сериите)</div>
+<h4>Седмичният брифинг (W28, рязан петък сутрин — еднодневна разлика с екрана)</h4>
+<div class="brief">US macro: Стагфлация (потвърдена) · топ движение DBA +3.6% (+2.51σ) · нито един каноничен pattern не се тригерира; частично: stagflation_hint 2/5.</div>
+<a class="dlink" href="http://localhost:8773" target="_blank">→ пълният US дашборд</a>
+</div>
+
+<div class="drawer" id="dr-vrm">
+<h4>VRM — режимното ядро</h4>
+<div class="row"><span class="nm">Alignment</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot up" style="left:75%"></div></div><span class="v"><span class="b up">6/8</span> <span class="small">стабилен ~6 цели 13 седм.</span></span></div>
+<div class="row"><span class="nm">KS margin</span><div class="track"><div class="zero" style="left:20%"></div><div class="range up" style="left:20%;width:56%"></div><div class="dot up" style="left:76%"></div></div><span class="v"><span class="b up">+8.48%</span> <span class="small">НЕАКТИВЕН</span></span></div>
+<div class="foot">кой точно крепи 6-те от 8 → етаж 2 (гласовете); възрастта на епизода → етаж 1</div>
+<div class="slot" style="margin-top:8px"><a class="dlink" href="vrm.html">→ Отвори пълния VRM екран</a> <span class="small">(билет 17-MANDATE-VRM-SCREEN изпълнен)</span></div>
+</div>
+
+<div class="drawer" id="dr-eu">
+<h4>Под-лещите</h4>
+<div class="row"><span class="nm">Инфлация</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:50.7%"></div></div><span class="v">50.7</span></div>
+<div class="row"><span class="nm">Кредит</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:44.7%"></div></div><span class="v">44.7</span></div>
+<div class="row"><span class="nm">Растеж</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:37.8%"></div></div><span class="v">37.8</span></div>
+<div class="row"><span class="nm">Труд</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:34.7%"></div></div><span class="v">34.7</span></div>
+<div class="row"><span class="nm">Външна</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:20.2%"></div></div><span class="v">20.2</span></div>
+<h4>Аномалиите</h4>
+<div class="row"><span class="nm">Bund 2Y <span class="small">7 седм.</span></span><div class="track"><div class="zero" style="left:50%"></div><div class="dot dn" style="left:99%"></div></div><span class="v"><span class="b dn">|z| 5.4 →</span> <span class="small">извън пистата</span></span></div>
+<div class="row"><span class="nm">Продажни цени (промишл.) <span class="small">7 седм.</span></span><div class="track"><div class="zero" style="left:50%"></div><div class="dot warn" style="left:97%"></div></div><span class="v"><span class="b warn">|z| 2.9</span></span></div>
+<div class="foot">…и още 3 (в билда: всичките 5)</div>
+<a class="dlink" href="http://localhost:8775" target="_blank">→ EU дашборд (папката с брифингите; собствен индекс = кандидат-доработка)</a>
+</div>
+
+<div class="drawer" id="dr-cn">
+<h4>Под-лещите</h4>
+<div class="row"><span class="nm">Кредит</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:52.3%"></div></div><span class="v">52.3</span></div>
+<div class="row"><span class="nm">Инфлация</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:48%"></div></div><span class="v">48.0</span></div>
+<div class="row"><span class="nm">Растеж</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:44.5%"></div></div><span class="v">44.5</span></div>
+<div class="row"><span class="nm">Имоти</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:23.2%"></div></div><span class="v">23.2</span></div>
+<div class="row"><span class="nm">Труд</span><div class="track"><div class="mark" style="left:50%"></div><div class="dot neu" style="left:18.6%"></div></div><span class="v">18.6</span></div>
+<h4>Аномалиите</h4>
+<div class="row"><span class="nm">LPR 1Y (PBoC) <span class="small">НОВ екстремум</span></span><div class="track"><div class="zero" style="left:50%"></div><div class="dot warn" style="left:8%"></div></div><span class="v"><span class="b warn">|z| 2.6</span></span></div>
+<div class="row"><span class="nm">Младежка безработица <span class="small">НОВ екстремум</span></span><div class="track"><div class="zero" style="left:50%"></div><div class="dot warn" style="left:88%"></div></div><span class="v"><span class="b warn">|z| 2.2</span></span></div>
+<div class="foot">…и още 1 (в билда: всичките 3)</div>
+<a class="dlink" href="http://localhost:8774" target="_blank">→ пълният China дашборд</a>
+</div>
+</div>
+
+<!-- ЕТАЖ 1 -->
+<div class="floor">
+<div class="fh"><span class="n">ЕТАЖ 1</span><span class="t">Режимът и възрастта му</span>
+<span class="d" title="Възрастта на епизода като свещ върху историческото разпределение (16 рефлационни епизода). KS = дистанция до предпазителя.">ⓘ</span></div>
+<div class="row"><span class="nm">РЕФЛАЦИЯ — възраст <span class="small">от 06.03.2026</span></span>
+<div class="track" title="18 седмици · медиана 13с (чертата) · най-дълъг 82с. Позиция: по-стар от ~2/3 от епизодите.">
+<div class="mark" style="left:15.9%" title="медианата: 13с"></div>
+<div class="range warn" style="left:0%;width:22%"></div>
+<div class="dot warn" style="left:22%"></div></div>
+<span class="v"><span class="b warn">18 седм.</span> <span class="small">медиана 13с · макс 82с</span></span></div>
+<div class="row"><span class="nm">KS margin <span class="small">S7 скорост</span></span>
+<div class="track" title="SPY +0.98% над прага −7.5%; margin +8.48%"><div class="zero" style="left:20%"></div>
+<div class="range up" style="left:20%;width:56%"></div><div class="dot up" style="left:76%"></div></div>
+<span class="v"><span class="b up">+8.48%</span> <span class="small">НЕАКТИВЕН</span></span></div>
+<div class="chips" style="margin-top:8px">
+<span class="chip"><b>GMS</b>4/8 MEDIUM</span>
+<span class="chip"><b>S10 · S11</b>потвърждават · net +0.22</span>
+</div>
+<div class="slot">слот ИГЛИТЕ (възрастта на макро-квадранта): честно празно — чака подписа на мандат 15</div>
+</div>
+
+<!-- ЕТАЖ 2 -->
+<div class="floor">
+<div class="fh"><span class="n">ЕТАЖ 2</span><span class="t">Гласовете под режима — кой го крепи</span>
+<span class="d" title="Ретро-погледът 8×13 [ВЪТРЕШЕН ПОГЛЕД]: % седмици «Съгласен» + класификация + текуща серия. Лентата = % съгласие 0-100.">ⓘ</span></div>
+<div class="row"><span class="nm">Дълг (дюрация)</span>
+<div class="track"><div class="range up" style="left:0;width:100%"></div><div class="dot up" style="left:100%"></div></div>
+<span class="v"><span class="badge firm">твърд поддръжник</span> <span class="small">100% · серия 13с</span></span></div>
+<div class="row"><span class="nm">Кредит</span>
+<div class="track"><div class="range up" style="left:0;width:77%"></div><div class="dot up" style="left:77%"></div></div>
+<span class="v"><span class="badge swing">люлее се</span> <span class="small">77% · серия 9с ОК</span></span></div>
+<div class="row"><span class="nm">Дефанзивни</span>
+<div class="track"><div class="range up" style="left:0;width:69%"></div><div class="dot neu" style="left:69%"></div></div>
+<span class="v"><span class="badge">смесен</span> <span class="small">69% · серия 3с</span></span></div>
+<div class="row"><span class="nm">Циклични</span>
+<div class="track"><div class="range up" style="left:0;width:62%"></div><div class="dot up" style="left:62%"></div></div>
+<span class="v"><span class="badge">смесен</span> <span class="small">62% · серия 8с</span></span></div>
+<div class="row"><span class="nm">Имоти</span>
+<div class="track"><div class="range up" style="left:0;width:62%"></div><div class="dot up" style="left:62%"></div></div>
+<span class="v"><span class="badge swing">люлее се</span> <span class="small">62% · 4 флипа</span></span></div>
+<div class="row"><span class="nm">Суровини</span>
+<div class="track"><div class="range warn" style="left:0;width:46%"></div><div class="dot warn" style="left:46%"></div></div>
+<span class="v"><span class="badge swing">разцепен 46/46</span> <span class="small">серия 6с ПРОТИВ</span></span></div>
+<div class="row"><span class="nm">Растежови</span>
+<div class="track"><div class="range up" style="left:0;width:23%"></div><div class="dot neu" style="left:23%"></div></div>
+<span class="v"><span class="badge">смесен</span> <span class="small">23% · серия 9с НАБЛ.</span></span></div>
+<div class="row"><span class="nm">Злато / инфл. защита</span>
+<div class="track"><div class="range dn" style="left:0;width:15%"></div><div class="dot dn" style="left:15%"></div></div>
+<span class="v"><span class="badge against">твърдо против</span> <span class="small">85% против · серия 11с</span></span></div>
+<div class="chips" style="margin-top:8px"><span class="chip"><b>M-INTER</b>2 флага: GLD/TLT · GLD/SPY</span>
+<span class="chip"><b>диагнозата</b>крепен от редуващ се състав</span></div>
+</div>
+
+<!-- ЕТАЖ 3 -->
+<div class="floor">
+<div class="fh"><span class="n">ЕТАЖ 3</span><span class="t">Пазарното платно</span>
+<span class="d" title="29-те range-свещи от v1 — тук са показани 6 представителни; в реалния екран е пълният списък по групи.">ⓘ</span></div>
+<div class="row"><span class="nm"><span class="t">SPY</span>S&amp;P 500</span>
+<div class="track"><div class="zero" style="left:30%"></div><div class="range up" style="left:26%;width:38%"></div><div class="dot up" style="left:62%"></div></div>
+<span class="v"><span class="b up">+1.37%</span> <span class="small">поз. 97%</span></span></div>
+<div class="row"><span class="nm"><span class="t">USO</span>Петрол WTI</span>
+<div class="track"><div class="zero" style="left:30%"></div><div class="range up" style="left:22%;width:70%"></div><div class="dot up" style="left:70%"></div></div>
+<span class="v"><span class="b up">+4.54%</span> <span class="small">поз. 44% · месец −19%</span></span></div>
+<div class="row"><span class="nm"><span class="t">DBA</span>Селскостопански</span>
+<div class="track"><div class="zero" style="left:30%"></div><div class="range up" style="left:28%;width:58%"></div><div class="dot up" style="left:80%"></div></div>
+<span class="v"><span class="b up">+3.85%</span> <span class="small">поз. 85% · тренд</span></span></div>
+<div class="row"><span class="nm"><span class="t">LQD</span>IG кредит</span>
+<div class="track"><div class="zero" style="left:30%"></div><div class="range dn" style="left:8%;width:26%"></div><div class="dot dn" style="left:11%"></div></div>
+<span class="v"><span class="b dn">−1.09%</span> <span class="small">поз. 10% — на дъното</span></span></div>
+<div class="row"><span class="nm"><span class="t">XLE</span>Енергия</span>
+<div class="track"><div class="zero" style="left:30%"></div><div class="range up" style="left:26%;width:56%"></div><div class="dot up" style="left:66%"></div></div>
+<span class="v"><span class="b up">+3.49%</span> <span class="small">поз. 68%</span></span></div>
+<div class="row"><span class="nm"><span class="t">XLB</span>Материали</span>
+<div class="track"><div class="zero" style="left:30%"></div><div class="range dn" style="left:6%;width:30%"></div><div class="dot dn" style="left:18%"></div></div>
+<span class="v"><span class="b dn">−2.15%</span> <span class="small">поз. 45%</span></span></div>
+<div class="foot">пълните 29 реда + месечната колона — както във v1 (тя остава непроменена, само влиза тук като етаж)</div>
+</div>
+
+<!-- ЕТАЖ 4 -->
+<div class="floor">
+<div class="fh"><span class="n">ЕТАЖ 4</span><span class="t">Секторът → имената</span>
+<span class="d" title="Е6б мостът (bridge.json, read-only): за най-силния и най-слабия сектор на седмицата — трите имена по сектор-неутрален ранг + рафт + AVOID. Правилото топ+дъно е предложение — одобри или смени.">ⓘ</span></div>
+<div class="cards2">
+<div class="scard"><h3>XLE Енергия <span class="b up" style="font-size:12px">най-силен: +3.49%</span></h3>
+<div class="cand"><span class="t">APA</span><div class="rank"><div class="fill" style="width:96.8%"></div><div class="dt" style="left:96.8%"></div></div><span class="v">96.8 <span class="badge swing">Quality Dip</span></span></div>
+<div class="cand"><span class="t">HAL</span><div class="rank"><div class="fill" style="width:95.6%"></div><div class="dt" style="left:95.6%"></div></div><span class="v">95.6 <span class="badge firm">Stable Winner</span></span></div>
+<div class="cand"><span class="t">VLO</span><div class="rank"><div class="fill" style="width:92.8%"></div><div class="dt" style="left:92.8%"></div></div><span class="v">92.8 <span class="badge swing">Quality Dip</span></span></div>
+<div class="meta">клетка REFLATION: N=76 · rel_vs_SPY −0.71% · win 42% — секторът исторически НЕ бие SPY тук · ширина: 19% над 50SMA / 75% над 200SMA</div></div>
+<div class="scard"><h3>XLB Материали <span class="b dn" style="font-size:12px">най-слаб: −2.15%</span></h3>
+<div class="cand"><span class="t">ALB</span><div class="rank"><div class="fill" style="width:99.2%"></div><div class="dt" style="left:99.2%"></div></div><span class="v">99.2 <span class="badge swing">Quality Dip</span></span></div>
+<div class="cand"><span class="t">STLD</span><div class="rank"><div class="fill" style="width:94.8%"></div><div class="dt" style="left:94.8%"></div></div><span class="v">94.8 <span class="badge">Neutral</span></span></div>
+<div class="cand"><span class="t">NUE</span><div class="rank"><div class="fill" style="width:92.6%"></div><div class="dt" style="left:92.6%"></div></div><span class="v">92.6 <span class="badge">Neutral</span></span></div>
+<div class="meta">имената с линкове F/Y като в етаж 3 · нива: „няма запис" (Е6А human-curated) · струва ли: оценъчния орган</div></div>
+</div>
+<div class="slot" style="margin-top:10px">слот КАИШКАТА (AI G-зона + пукнатини 4/10): влиза СЛЕД уикендното решение за формата ѝ</div>
+</div>
+
+<div class="foot">МАКЕТ: подредбата е за одобрение; числата са РЕАЛНИ от днес (сателит · ретро гласовете · Е2 · bridge.json · екран v1),
+но позициите на свещите са рисувани приблизително. Наблюдение, не сигнал. Реалният билд: детерминистичен, като v1.</div>
+</div>
+<script>
+function dr(id, card){
+  var d=document.getElementById('dr-'+id);
+  var was=d.classList.contains('on');
+  document.querySelectorAll('.drawer').forEach(function(x){x.classList.remove('on')});
+  document.querySelectorAll('.lcard').forEach(function(x){x.classList.remove('open')});
+  if(!was){d.classList.add('on');card.classList.add('open');}
+}
+</script>
+</body></html>
