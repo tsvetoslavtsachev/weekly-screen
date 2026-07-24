@@ -153,6 +153,7 @@ def load_core():
     ks = last("vrm_ks_state.json")
     return {"margin":vel["margin_pct"],"ks_asof":vel["as_of"],"ks_active":ks["active"],
             "gms":ov["gms"],"align":ov["alignment_score"],
+            "align_total":len(ov["alignment_flags"]),"vrm_asof":ov["as_of"],
             "s11_net":dv["confirmation"]["net_confirm"],"s11":dv["confirmation"]["counts"],
             "s10":"ПОТВЪРЖДАВА" if json.load(open(DC/"vrm_confirmation_matrix.json",encoding="utf-8"))[-1]["assets"]["etf_spy"]["confluence"]["verdict"]=="confirm" else "ВНИМАНИЕ"}
 
@@ -550,15 +551,18 @@ def sublens_rows(lenses):
                    f'<span class="v">{v:.1f}</span></div>')
     return "\n".join(out)
 
-def floor0(sat, brief):
+def floor0(sat, brief, core):
+    # VRM редовете пият от каноничната верига (data-core: vrm_overlay + vrm_ks_state)
+    # — сателитният regimes.vrm блок е окълцан след мандат №36 (без alignment_total,
+    # ks_status='unknown' при NULL) и остава само за us/eu/cn лещите.
     rg = sat["regimes"]
     an = sat["persistent_anomalies"]
     tl = "".join(f'<div class="brief">{b}</div>' for b in brief[:4])
-    us, eu, cn, vrm = rg["us_macro"], rg["eu_macro"], rg["cn_macro"], rg["vrm"]
+    us, eu, cn = rg["us_macro"], rg["eu_macro"], rg["cn_macro"]
     faces = "".join([
-        lens_face("vrm","РЕФЛАЦИЯ", f"VRM · до {vrm['as_of'][:10]} (месечен)",
-                  [("alignment", vrm["alignment_score"]/vrm["alignment_total"]*100),
-                   ("KS", 15 if vrm["ks_status"]=="inactive" else 90),
+        lens_face("vrm","РЕФЛАЦИЯ", f"VRM · до {core['vrm_asof'][:10]} (седмичен)",
+                  [("alignment", core["align"]/core["align_total"]*100),
+                   ("KS", 90 if core["ks_active"] else 15),
                    ("GMS", 50)],
                   '<span class="dvg">гласовете → етаж 2</span>'),
         lens_face("us", us["regime_label_bg"], f"САЩ · до {us['as_of'][:10]}",
@@ -582,9 +586,9 @@ def floor0(sat, brief):
                 f'{extra}<a class="dlink" href="{link}" target="_blank">→ пълният дашборд</a></div>')
     dvrm = (f'<div class="drawer" id="dr-vrm"><h4>VRM — режимното ядро</h4>'
             f'<div class="row"><span class="nm">Alignment</span><div class="track"><div class="mark" style="left:50%"></div>'
-            f'<div class="dot up" style="left:{vrm["alignment_score"]/vrm["alignment_total"]*100:.0f}%"></div></div>'
-            f'<span class="v"><span class="b up">{vrm["alignment_score"]:.0f}/{vrm["alignment_total"]}</span></span></div>'
-            f'<div class="foot">кой крепи тези {vrm["alignment_score"]:.0f} от {vrm["alignment_total"]} → етаж 2 · възрастта на епизода → етаж 1</div>'
+            f'<div class="dot up" style="left:{core["align"]/core["align_total"]*100:.0f}%"></div></div>'
+            f'<span class="v"><span class="b up">{core["align"]:.0f}/{core["align_total"]}</span></span></div>'
+            f'<div class="foot">кой крепи тези {core["align"]:.0f} от {core["align_total"]} → етаж 2 · възрастта на епизода → етаж 1</div>'
             f'<div class="slot"><a class="dlink" href="vrm.html">→ Отвори пълния VRM екран</a> <span class="small">(мандат 17 изпълнен · билд: build_vrm_screen.py, пуска се СЛЕД build_screen.py)</span></div></div>')
     return (f'<div class="floor"><div class="fh"><span class="n">ЕТАЖ 0</span>'
             f'<span class="t">Икономиката — четирите лещи (клик за чекмеджето)</span>'
@@ -853,7 +857,7 @@ def main():
 <div class="tile"><div class="k">Най-силен</div><div class="n up">{best['ticker']} {best['week']['chg']:+.2f}%</div><div class="m">{best['name']}</div></div>
 <div class="tile"><div class="k">Най-слаб</div><div class="n dn">{worst['ticker']} {worst['week']['chg']:+.2f}%</div><div class="m">{worst['name']}</div></div>
 </div>
-{floor0(sat,brief)}
+{floor0(sat,brief,core)}
 {floor1(age,core,storms)}
 {floor2(votes)}
 <div class="floor"><div class="fh"><span class="n">ЕТАЖ 3</span><span class="t">Пазарното платно — лицето</span>
