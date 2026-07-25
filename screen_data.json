@@ -686,7 +686,7 @@
    "top3": 95.27,
    "bot3": 5.67,
    "avoid": 0,
-   "s10_verdict": "confirm"
+   "s10_verdict": "contradict-watch"
   },
   {
    "etf": "XLY",
@@ -732,31 +732,31 @@
  "age": {
   "regime": "REFLATION",
   "start": "2026-03-06",
-  "age": 20,
-  "asof": "2026-07-17",
+  "age": 21,
+  "asof": "2026-07-24",
   "median": 13.5,
   "max": 82,
   "n": 16
  },
  "core": {
-  "margin": 7.03799,
-  "ks_asof": "2026-07-17",
+  "margin": 8.863531,
+  "ks_asof": "2026-07-24",
   "ks_active": false,
   "gms": {
-   "score": 1,
+   "score": 2,
    "max": 8,
    "tier": "LOW",
    "signals": {
     "s1_eem_spy_3m": 0,
-    "s2_efa_3m": 1,
+    "s2_efa_3m": 2,
     "s3_gld_tlt_3m": 0,
     "s4_dxy_inv_3m": 0
    }
   },
-  "align": 5,
+  "align": 4,
   "align_total": 8,
-  "vrm_asof": "2026-07-17",
-  "s11_net": 1.0,
+  "vrm_asof": "2026-07-24",
+  "s11_net": 0.555556,
   "s10": "ПОТВЪРЖДАВА"
  },
  "missing": []
