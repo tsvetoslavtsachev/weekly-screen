@@ -15,7 +15,7 @@
 
 CLI (по подразбиране = production пътищата; override-ите са САМО за теста в scratchpad):
   --storms-dir PATH   папката с бурите-YAML (default: vault chronicle/storms)
-  --out PATH          къде се пише storms_state.json (default: C:\\Projects\\_weekly_screen)
+  --out PATH          къде се пише storms_state.json (default: C:\\Projects\\markets\\weekly-screen)
   --journal PATH      журналът за append (default: vault chronicle/STORMS.md)
   --snapshot PATH     мокната merged снимка (JSON) вместо живите източници — само за тест
 """
@@ -27,8 +27,8 @@ from datetime import date as _date
 VAULT     = Path(r"C:\Tsachev Knowledge OS\tsachev-ops\chronicle")
 STORMS_DIR = VAULT / "storms"
 JOURNAL    = VAULT / "STORMS.md"
-OUT        = Path(r"C:\Projects\_weekly_screen")
-HYPE_FILE  = Path(r"C:\Projects\ai-hype-monitor\app\data\v2\euphoria_series.json")  # КАИШКАТА (READ-ONLY)
+OUT        = Path(r"C:\Projects\markets\weekly-screen")
+HYPE_FILE  = Path(r"C:\Projects\markets\ai-hype-monitor\app\data\v2\euphoria_series.json")  # КАИШКАТА (READ-ONLY)
 
 # фиксиран ред на ключовете за детерминизъм в изхода
 _COND_KEYS = ("id", "voice", "label", "field", "test", "core", "link", "lies_when", "holds")

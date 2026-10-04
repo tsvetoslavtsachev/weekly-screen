@@ -5,7 +5,7 @@
 Етаж 1 режимът (episodes CSV + data-core state READ-ONLY) ·
 Етаж 2 гласовете (vote_consistency_13w.csv, [ВЪТРЕШЕН ПОГЛЕД]) ·
 Етаж 3 платното (price-archive) · Етаж 4 разбивката на сектора (радар data.json + S10 матрица + bridge.json).
-Числата пише САМО този код. Пише единствено в C:\\Projects\\_weekly_screen\\.
+Числата пише САМО този код. Пише единствено в C:\\Projects\\markets\\weekly-screen\\.
 
 Ритуалната последователност (съботно): build_storms.py → build_screen.py → build_vrm_screen.py.
 build_storms.py пише storms_state.json (именуваните бури, мандат №26); този билд го ЧЕТЕ
@@ -17,7 +17,7 @@ from pathlib import Path
 from datetime import date as _date
 
 ARCHIVE = Path(r"C:\Projects\price-archive\archive")
-OUT = Path(r"C:\Projects\_weekly_screen")
+OUT = Path(r"C:\Projects\markets\weekly-screen")
 SAT = Path(r"C:\Projects\dashboards\macro-satellite\docs\state.json")
 BRIEF_DIR = Path(r"C:\Projects\dashboards\macro-satellite\briefings")
 VOTES = Path(r"C:\Projects\_votes_retro_analytics\vote_consistency_13w.csv")

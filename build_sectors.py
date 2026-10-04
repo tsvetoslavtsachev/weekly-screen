@@ -11,7 +11,7 @@
   bs.load_radar/load_matrix_last/load_bridge    → същите източници (READ-ONLY)
   bs.CSS + bs.ETF2GICS + bs.VERDICT_BG …        → същият стил и речник
 
-Числата пише САМО този код. Пише единствено в C:\\Projects\\_weekly_screen\\sectors.html.
+Числата пише САМО този код. Пише единствено в C:\\Projects\\markets\\weekly-screen\\sectors.html.
 ФОРМА-КАНОН §1: извод първо · всяко име → Finviz/Yahoo · tooltip на всеки термин ·
 as-of дата · О4 бадж · back-link към екрана · речникът (glossary.html) споделен.
 """
