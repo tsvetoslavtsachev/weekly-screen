@@ -20,12 +20,12 @@ ARCHIVE = Path(r"C:\Projects\price-archive\archive")
 OUT = Path(r"C:\Projects\markets\weekly-screen")
 SAT = Path(r"C:\Projects\macro\macro-satellite\docs\state.json")
 BRIEF_DIR = Path(r"C:\Projects\macro\macro-satellite\briefings")
-VOTES = Path(r"C:\Projects\_votes_retro_analytics\vote_consistency_13w.csv")
-EPIS = Path(r"C:\Projects\_votes_retro_analytics\regime_episodes.csv")
+VOTES = Path(r"C:\Projects\lab\_votes_retro_analytics\vote_consistency_13w.csv")
+EPIS = Path(r"C:\Projects\lab\_votes_retro_analytics\regime_episodes.csv")
 DC = Path(r"C:\Projects\data-core\data\state")
 BRIDGE = Path(r"C:\Projects\data-core\migrations\m_bridge\bridge.json")
 RADAR = Path(r"C:\Projects\markets\SP500-rotationradar\docs\data.json")
-BARO = Path(r"C:\Projects\_etf_remote\docs\barometer_feed.json")   # Ф-4: чете се директно при рендер; НЕ влиза в screen_data.json
+BARO = Path(r"C:\Projects\markets\etf-rotationradar\docs\barometer_feed.json")   # Ф-4: чете се директно при рендер; НЕ влиза в screen_data.json
 STORMS_STATE = OUT / "storms_state.json"   # мандат №26: пише го build_storms.py; тук READ-ONLY за възел-картата на Етаж 1
 
 WEEK_START, WEEK_END = "2026-07-06", "2026-07-10"

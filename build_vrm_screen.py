@@ -25,7 +25,7 @@ G3 node --check + error банер · G4 нула записи в data-core.
 import json, csv, html, statistics, hashlib, os
 
 OVERLAY = r"C:\Projects\data-core\data\state\vrm_overlay.json"
-VOTES_DIR = r"C:\Projects\_votes_retro_analytics"
+VOTES_DIR = r"C:\Projects\lab\_votes_retro_analytics"
 OUT = r"C:\Projects\markets\weekly-screen\vrm.html"
 WINDOW = 13
 
