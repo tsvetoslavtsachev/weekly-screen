@@ -52,6 +52,9 @@ ETF2GICS = {"XLE":"Energy","XLB":"Materials","XLK":"Information Technology","XLV
 LENS_BG = {"labor":"Труд","growth":"Растеж","inflation":"Инфлация","liquidity":"Ликвидност",
            "credit":"Кредит","external":"Външна","property":"Имоти"}
 STATE_BG = {"OK":"Съгласен","WATCH":"Наблюдава","UNDER":"Против","OVER":"OVER"}
+# Същият речник като build_vrm_screen.py REGIME_BG (там Title-case; на картата .upper()).
+REGIME_BG = {"REFLATION":"Рефлация","GROWTH":"Растеж","STAGNATION":"Стагнация",
+             "DEFLATION":"Дефлация","CRISIS":"Криза"}
 # ЕТАЖ 4 разбивка: рафтовете (quadrant_1m), цветовете и S10 присъдите.
 # Стойностите на quadrant_1m се ЕНУМЕРИРАТ от данните; тук е само реда/абревиатурата/цвета.
 QUAD_ORDER = ["Stable Winner","Quality Dip","Neutral","Faded Bounce","Chronic Loser"]
@@ -148,12 +151,20 @@ def load_age():
 
 def last(f): d=json.load(open(DC/f,encoding="utf-8")); return d[-1] if isinstance(d,list) else d
 
+def load_regime(asof):
+    # Честната (expanding-Z) серия vrm_regime.json — месечна. Последният запис с
+    # as_of <= as_of на картата (vrm_overlay), за да не надникне след нея.
+    d = json.load(open(DC/"vrm_regime.json", encoding="utf-8"))
+    return [r for r in d if r["as_of"][:10] <= asof[:10]][-1]
+
 def load_core():
     vel, ov, dv = last("vrm_ks_velocity.json"), last("vrm_overlay.json"), last("vrm_b6_divergence.json")
     ks = last("vrm_ks_state.json")
+    rg = load_regime(ov["as_of"])
     return {"margin":vel["margin_pct"],"ks_asof":vel["as_of"],"ks_active":ks["active"],
             "gms":ov["gms"],"align":ov["alignment_score"],
             "align_total":len(ov["alignment_flags"]),"vrm_asof":ov["as_of"],
+            "regime":rg["regime"],"regime_asof":rg["as_of"],"regime_prov":rg.get("provisional",False),
             "s11_net":dv["confirmation"]["net_confirm"],"s11":dv["confirmation"]["counts"],
             "s10":"ПОТВЪРЖДАВА" if json.load(open(DC/"vrm_confirmation_matrix.json",encoding="utf-8"))[-1]["assets"]["etf_spy"]["confluence"]["verdict"]=="confirm" else "ВНИМАНИЕ"}
 
@@ -561,7 +572,11 @@ def floor0(sat, brief, core):
     tl = "".join(f'<div class="brief">{b}</div>' for b in brief[:4])
     us, eu, cn = rg["us_macro"], rg["eu_macro"], rg["cn_macro"]
     faces = "".join([
-        lens_face("vrm","РЕФЛАЦИЯ", f"VRM · до {core['vrm_asof'][:10]} (седмичен)",
+        lens_face("vrm",
+                  f'<span title="режим от vrm_regime.json (честна серия) към {core["regime_asof"][:10]}'
+                  f'{" · предварителен" if core["regime_prov"] else ""}">'
+                  f'{REGIME_BG[core["regime"]].upper()}</span>',
+                  f"VRM · до {core['vrm_asof'][:10]} (седмичен)",
                   [("alignment", core["align"]/core["align_total"]*100),
                    ("KS", 90 if core["ks_active"] else 15),
                    ("GMS", 50)],
