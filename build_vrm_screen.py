@@ -25,6 +25,7 @@ G3 node --check + error банер · G4 нула записи в data-core.
 import json, csv, html, statistics, hashlib, os
 
 OVERLAY = r"C:\Projects\data-core\data\state\vrm_overlay.json"
+KS_STATE = r"C:\Projects\data-core\data\state\vrm_ks_state.json"
 VOTES_DIR = r"C:\Projects\lab\_votes_retro_analytics"
 OUT = r"C:\Projects\markets\weekly-screen\vrm.html"
 WINDOW = 13
@@ -112,9 +113,15 @@ scores = [int(r['alignment_score']) for r in csv_rows]
 ep_scores = [d['alignment_score'] for d in data if d['as_of'] >= current_ep['start']]
 EP_MIN, EP_MAX = min(ep_scores), max(ep_scores)
 
-ks = last['kill_switch']
 c4 = last['cumulative_4w']
-KS_ACTIVE = bool(ks.get('active'))
+# KS състоянието живее в vrm_ks_state.json (S6e-ks машината), НЕ в overlay-а:
+# overlay.kill_switch.active е null по дизайн (s6d import_overlay го оставя на S6e-ks).
+# Четенето от overlay-а даваше вечно „НЕАКТИВЕН“ (уловено при KS епизод 11, 21.11.2026).
+with open(KS_STATE, encoding='utf-8') as f:
+    ks = json.load(f)[-1]
+assert ks['as_of'] == last['as_of'], f"G2b: KS state {ks['as_of']} != overlay {last['as_of']}"
+assert isinstance(ks.get('active'), bool), f"G2b: KS active не е bool: {ks.get('active')!r}"
+KS_ACTIVE = ks['active']
 KS_TXT = 'АКТИВЕН' if KS_ACTIVE else 'НЕАКТИВЕН'
 W_START, W_END = csv_rows[0]['as_of'], csv_rows[-1]['as_of']
 

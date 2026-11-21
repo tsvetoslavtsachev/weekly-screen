@@ -673,7 +673,9 @@ def storms_card(storms):
 
 def floor1(age, core, storms=None):
     agp = age["age"]/age["max"]*100; mdp = age["median"]/age["max"]*100
-    marg = core["margin"]; mp = min(20+marg/15*76,96)
+    marg = core["margin"]; mp = max(min(20+marg/15*76,96),2)
+    # под прага (margin < 0) лентата тръгва наляво от чертата и е червена; беше заковано „up“ (KS епизод 11, 21.11.2026)
+    kc = "up" if marg >= 0 else "dn"; rl, rw = min(mp,20), abs(mp-20)
     g = core["gms"]
     return (f'<div class="floor"><div class="fh"><span class="n">ЕТАЖ 1</span><span class="t">Режимът и възрастта му</span>'
             f'<span class="d" title="Възрастта на епизода върху историческото разпределение ({age["n"]} рефлационни епизода от 2007). KS = дистанция до предпазителя.">ⓘ</span></div>'
@@ -684,8 +686,8 @@ def floor1(age, core, storms=None):
             f'<span class="v"><span class="b warn">{age["age"]} седм.</span> <span class="small">медиана {age["median"]:.0f}с · макс {age["max"]}с</span></span></div>'
             f'<div class="row"><span class="nm">KS margin <span class="small">S7 · {core["ks_asof"]}</span></span>'
             f'<div class="track" title="margin {marg:+.2f}% до прага −7.5%"><div class="zero" style="left:20%"></div>'
-            f'<div class="range up" style="left:20%;width:{mp-20:.0f}%"></div><div class="dot up" style="left:{mp:.0f}%"></div></div>'
-            f'<span class="v"><span class="b up">{marg:+.2f}%</span> <span class="small">{"АКТИВЕН" if core["ks_active"] else "НЕАКТИВЕН"}</span></span></div>'
+            f'<div class="range {kc}" style="left:{rl:.0f}%;width:{rw:.0f}%"></div><div class="dot {kc}" style="left:{mp:.0f}%"></div></div>'
+            f'<span class="v"><span class="b {kc}">{marg:+.2f}%</span> <span class="small">{"АКТИВЕН" if core["ks_active"] else "НЕАКТИВЕН"}</span></span></div>'
             f'<div class="hero" style="margin:10px 0 0"><div class="tile"><div class="k">GMS</div><div class="n">{g["score"]}/{g["max"]}</div><div class="m">{g["tier"]}</div></div>'
             f'<div class="tile"><div class="k">S10 бенчмарк</div><div class="n">{core["s10"]}</div><div class="m">SPY confluence</div></div>'
             f'<div class="tile"><div class="k">S11 дивергенция</div><div class="n">net {core["s11_net"]:+.2f}</div>'
