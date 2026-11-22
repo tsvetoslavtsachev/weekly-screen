@@ -28,8 +28,39 @@ RADAR = Path(r"C:\Projects\markets\SP500-rotationradar\docs\data.json")
 BARO = Path(r"C:\Projects\markets\etf-rotationradar\docs\barometer_feed.json")   # Ф-4: чете се директно при рендер; НЕ влиза в screen_data.json
 STORMS_STATE = OUT / "storms_state.json"   # мандат №26: пише го build_storms.py; тук READ-ONLY за възел-картата на Етаж 1
 
-WEEK_START, WEEK_END = "2026-07-06", "2026-07-10"
-WEEK_LABEL = "W28 · 06–10.07.2026"
+def closed_week(today=None):
+    """ИЛЮ3 (22.11.2026): седмицата се извежда от датата, не се вписва на ръка.
+    Затворената търговска седмица към `today`: в събота и неделя е току-що минаващата
+    (понеделник-петък); от понеделник до петък е предишната (петъкът още не е затворил).
+    Връща (mon_iso, fri_iso, label) в стила 'W47 · 16–20.11.2026'; седмица през месец или
+    година носи месеца (и годината) и на двете дати, както iso_week в saturday_auto.py.
+    Пренасочване: env WEEK_FRIDAY=ГГГГ-ММ-ДД или wk_build.py (--mon/--fri/--label)."""
+    import os as _os
+    from datetime import timedelta as _td
+    env = _os.environ.get("WEEK_FRIDAY")
+    if env:
+        fri = _date.fromisoformat(env)
+    else:
+        t = today or _date.today()
+        fri = t - _td(days=(t.weekday() - 4) % 7) if t.weekday() >= 5 else t - _td(days=t.weekday() + 3)
+    mon = fri - _td(days=4)
+    wk = mon.isocalendar()[1]
+    if mon.year != fri.year:
+        span = "{}–{}".format(mon.strftime("%d.%m.%Y"), fri.strftime("%d.%m.%Y"))
+    elif mon.month != fri.month:
+        span = "{}–{}.{}".format(mon.strftime("%d.%m"), fri.strftime("%d.%m"), fri.strftime("%Y"))
+    else:
+        span = "{}–{}.{}.{}".format(mon.strftime("%d"), fri.strftime("%d"), mon.strftime("%m"), mon.strftime("%Y"))
+    return mon.isoformat(), fri.isoformat(), "W{} · {}".format(wk, span)
+
+
+WEEK_START, WEEK_END, WEEK_LABEL = closed_week()
+
+
+def week_tag():
+    """'2026-W47' от WEEK_START (името на брифинга на сателита)."""
+    y, w, _ = _date.fromisoformat(WEEK_START).isocalendar()
+    return "{}-W{:02d}".format(y, w)
 MONTH_TDAYS = 21
 
 GROUPS = [
@@ -99,7 +130,7 @@ def weekly_z(t):
     """Седмичен z по метода на сателита (analytics/z_scores.weekly_z):
     седмични затваряния = последният daily запис по as_of във всяка ISO седмица (пон-нед) ≤ WEEK_END;
     седмични промени в % между съседни седмици;
-    текущата промяна (W28) срещу mean/std на предходните 13 седмични промени.
+    текущата промяна (седмицата WEEK_END) срещу mean/std на предходните 13 седмични промени.
     std = population (pstdev, ddof=0) — точно както сателитът (statistics.pstdev).
     Връща None ако няма ≥14 седмични промени (13 baseline + текуща)."""
     rows = load_rows(t)
@@ -125,7 +156,7 @@ def load_satellite():
     return s
 
 def load_brief_tldr():
-    f = BRIEF_DIR / "2026-W28.md"
+    f = BRIEF_DIR / (week_tag() + ".md")
     if not f.exists(): return []
     lines = f.read_text(encoding="utf-8").splitlines()
     out, on = [], False
@@ -598,7 +629,7 @@ def floor0(sat, brief, core):
                 f'<h4>Упоритите аномалии — сериите, които постоянно се отклоняват (по |z|)</h4>'
                 f'<div class="foot">|z| = размерът на отклонението в стандартни отклонения (σ) спрямо близката норма; по-високо = по-необичайно движение · лентата = средното |z|, чертата = прагът за влизане (макс |z| ≥ 2 за поне 2 от 4 седмици) · знакът/посоката (нагоре/надолу) НЕ е в този канал — виж дашборда.</div>'
                 f'{anomaly_rows(anoms)}'
-                f'<h4>Седмичният брифинг (W28, рязан петък сутрин — еднодневна разлика с екрана)</h4>{tl}'
+                f'<h4>Седмичният брифинг ({WEEK_LABEL.split(" · ")[0]}, рязан петък сутрин — еднодневна разлика с екрана)</h4>{tl}'
                 f'{extra}<a class="dlink" href="{link}" target="_blank">→ пълният дашборд</a></div>')
     dvrm = (f'<div class="drawer" id="dr-vrm"><h4>VRM — режимното ядро</h4>'
             f'<div class="row"><span class="nm">Alignment</span><div class="track"><div class="mark" style="left:50%"></div>'
