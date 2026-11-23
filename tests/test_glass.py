@@ -76,6 +76,21 @@ def test_missing_lights_file_says_so_on_the_page(tmp_path):
     assert "липсва" in s and "s-sivo" in s
 
 
+def test_c_23_11_no_lens_word_no_kill_switch_trail_and_areas(tmp_path):
+    """Ц., 23.11.2026: без думата „леща“, без Kill Switch, ходът на VRM и уредите на таблата, тъмно."""
+    bg.build("2026-11-20", lights("2026-11-20"), tmp_path)
+    s = (tmp_path / "staklo" / "2026-11-20.html").read_text(encoding="utf-8")
+    t = (tmp_path / "staklo" / "2026-11-20.txt").read_text(encoding="utf-8")
+    for x in (s, t):
+        assert "лещ" not in x.lower() and "kill switch" not in x.lower()
+    tile13 = re.search(r'id="t13".*?</article>', s, re.S)[0]
+    assert tile13.count('<i class="rg') == len(json.loads(lights("2026-11-20").read_text(encoding="utf-8"))
+                                               ["tiles"][12]["trail"])
+    tile11 = re.search(r'id="t11".*?</article>', s, re.S)[0]
+    assert 'class="areas"' in tile11 and "таблото: <b>" in tile11
+    assert re.search(r":root\{--bg:#121417", s)
+
+
 @pytest.mark.parametrize("week", WEEKS)
 def test_g6_and_no_paths(week, tmp_path):
     bg.build(week, lights(week), tmp_path)

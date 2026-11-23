@@ -41,8 +41,12 @@ ROWS = [
     ("ikonomika", "Икономиката и централните банки"),
     ("model", "Моделът"),
 ]
-LENS_BG = {"labor": "труд", "growth": "растеж", "inflation": "инфлация", "liquidity": "ликвидност",
+# Областите на макро таблата (във файла „Леща X“; на стъклото само името на областта, Ц. 23.11.2026)
+AREA_BG = {"labor": "пазар на труда", "growth": "растеж", "inflation": "инфлация", "liquidity": "ликвидност",
            "credit": "кредит", "external": "външен сектор", "property": "имоти", "housing": "имоти"}
+VERDICT_BG = {"policy dilemma": "дилема за политиката"}
+# Цветът на режима на VRM в хода (само за различаване; непознат режим е първият цвят)
+REGIME_CLASS = {"GROWTH": "rg4", "REFLATION": "rg2", "STAGFLATION": "rg3", "DEFLATION": "rg1"}
 FLAG_BG = {"amber": "жълт", "yellow": "жълт", "red": "червен", "green": "зелен", "alarm": "аларма",
            "mixed": "смесен", "contracting": "свиване", "expanding": "разширение", "base": "в база",
            "gray": "сива зона"}
@@ -84,8 +88,10 @@ def clean(text: str) -> str:
     """Готов текст от файла за показване: без пътища, без английски етикети, дати като ДД.ММ.ГГГГ,
     десетична запетая."""
     t = PATH_RE.sub("файл", text or "")
-    t = re.sub(r"Леща (\w+)", lambda m: "леща " + LENS_BG.get(m[1], m[1]), t)
-    t = t.replace("health_z", "оценката спрямо нормалното")
+    t = re.sub(r"Леща (\w+)", lambda m: AREA_BG.get(m[1], m[1]), t)
+    t = t.replace("health_z на лещата", "отклонението от нормалното")
+    t = t.replace("health_z", "отклонението от нормалното")
+    t = re.sub(r"лещ(ата|ите|а)\b", lambda m: {"ата": "областта", "ите": "областите", "а": "област"}[m[1]], t)
     t = re.sub(r"зона (alarm|base|gray)", lambda m: "зона " + FLAG_BG[m[1]], t)
     t = isoize(t)
     t = re.sub(r"(?<=\d)\.(?=\d)", ",", t)
@@ -95,7 +101,7 @@ def clean(text: str) -> str:
 
 def member_name(name: str) -> str:
     m = re.match(r"Леща (\w+)$", name or "")
-    return f"леща {LENS_BG.get(m[1], m[1])}" if m else (name or "")
+    return AREA_BG.get(m[1], m[1]) if m else (name or "")
 
 
 def source_name(src: str, series: str) -> str:
@@ -130,7 +136,7 @@ def anchor(m: dict) -> str:
         return f"z {num(z, 2, True)} спрямо обичайната седмица"
     zo = m.get("z_own")
     if zo is not None:
-        return f"z {num(zo, 2, True)} спрямо нормалното за лещата"
+        return f"z {num(zo, 2, True)} спрямо собствената си история"
     if m.get("flag"):
         f = str(m["flag"])
         return f"флаг на уреда: {FLAG_BG.get(f, clean(f))}"
@@ -177,8 +183,6 @@ def tile_view(t: dict, week_end: str) -> dict:
         v["source"] = source_name(m.get("source", ""), m.get("series", ""))
         if t["id"] == 13:
             v["anchor"] = clean(m.get("why") or s.get("why") or "")
-            if s.get("name") == "Kill Switch":
-                v["anchor"] = "активен" if s.get("value") == "активен" else clean(str(s.get("value")))
         else:
             v["num"] = headline(m)
             v["anchor"] = anchor(m)
@@ -199,7 +203,64 @@ def tile_view(t: dict, week_end: str) -> dict:
         if reg and s.get("name") != "Режимът (седмичен ход)":
             v["extra"].append(f"режимът {reg.get('value')}: {clean(reg.get('why') or '')}")
     v["grey"] = [member_name(g.get("name", "")) for g in t.get("grey_members", [])]
+    # какво показват уредите на таблото: присъдата му и областите като ленти (оценка 0-100)
+    vd = t.get("verdict")
+    if vd and st != "sivo":
+        lab = str(vd.get("label") or "")
+        for en, bgl in VERDICT_BG.items():
+            lab = re.sub(re.escape(en), bgl, lab, flags=re.I)
+        lab = lab.lower() if lab.isupper() else lab
+        comp = vd.get("composite")
+        v["verdict"] = (lab, num(comp, 1) if isinstance(comp, (int, float)) else "")
+        v["areas"] = [(member_name(m["name"]), m.get("value"), m.get("state", "sivo"))
+                      for m in t.get("members", []) if str(m.get("name", "")).startswith("Леща ")]
+    # ходът на модела по седмици (от файла, последните 13)
+    if t.get("trail") and st != "sivo":
+        v["trail"] = t["trail"]
     return v
+
+
+def verdict_html(v: dict) -> str:
+    e = html.escape
+    out = []
+    if v.get("verdict"):
+        lab, comp = v["verdict"]
+        out.append(f'<p class="verdict">таблото: <b>{e(lab)}</b>'
+                   + (f', общата оценка {e(comp)}' if comp else "") + "</p>")
+    if v.get("areas"):
+        rows = []
+        for name, score, st in v["areas"]:
+            # най-малко 4 %, за да се вижда цветът и при оценка около нула
+            w = max(4.0, min(100.0, float(score))) if isinstance(score, (int, float)) else 0.0
+            tip = f"{name}: оценка {num(score, 1) if isinstance(score, (int, float)) else 'няма'} от 100, {STATE_BG.get(st, st)}"
+            rows.append(f'<span>{e(name)}</span><span class="b s-{st}" title="{e(tip)}"><i style="width:{w:.0f}%"></i></span>')
+        out.append('<div class="areas">' + "".join(rows) + "</div>")
+    return "".join(out)
+
+
+def trail_html(trail: list) -> str:
+    e = html.escape
+    pts = [r for r in trail if r.get("as_of")]
+    if not pts:
+        return ""
+    bars, segs = [], []
+    for r in pts:
+        sc = r.get("alignment_score")
+        h = max(3.0, float(sc) / 8 * 100) if isinstance(sc, (int, float)) else 3.0
+        cls = REGIME_CLASS.get(str(r.get("regime")), "rg1")
+        tip = f"{ddmm(r['as_of'])}: {r.get('regime')}, гласове {sc if sc is not None else 'няма'} от 8"
+        bars.append(f'<i class="{cls}" style="height:{h:.0f}%" title="{e(tip)}"></i>')
+        if segs and segs[-1][0] == r.get("regime"):
+            segs[-1][1] += 1
+        else:
+            segs.append([r.get("regime"), 1])
+    regs = "".join(f'<span class="{REGIME_CLASS.get(str(g), "rg1")}" style="flex:{n}">{e(str(g))}</span>' for g, n in segs)
+    f0, f1 = pts[0], pts[-1]
+    s0, s1 = f0.get("alignment_score"), f1.get("alignment_score")
+    ends = (f'<div class="ends"><span title="{e(ddmm(f0["as_of"]))}">в началото {e(str(s0))}</span>'
+            f'<span>сега <b>{e(str(s1))}</b></span></div>')
+    return (f'<div class="trail" title="гласовете за режима по седмици, {len(pts)} седмици, височината е от 8">'
+            f'<div class="bars">{"".join(bars)}</div><div class="regs">{regs}</div>{ends}</div>')
 
 
 def tile_html(v: dict, base: str) -> str:
@@ -212,8 +273,11 @@ def tile_html(v: dict, base: str) -> str:
         body.append(f'<p class="mem">{e(v["member"])}</p>')
         line = (f'<span class="big">{e(v["num"])}</span> ' if v["num"] else "") + f'<span class="anc">{e(v["anchor"])}</span>'
         body.append(f'<p class="val">{line}</p>')
+    body.append(verdict_html(v))
     for x in v["extra"]:
         body.append(f'<p class="extra">{e(x)}</p>')
+    if v.get("trail"):
+        body.append(trail_html(v["trail"]))
     if v["grey"]:
         body.append(f'<p class="greym">сиви членове: {e(", ".join(v["grey"]))}</p>')
     meta = e(v["age"]) + (f' · {e(v["source"])}' if v["source"] else "")
@@ -230,12 +294,7 @@ def engine_view(d: dict) -> str:
         parts = [f"моделът още не е минал за тази седмица; последен ход {ddmm(er.get('model_last_run'))}"]
     else:
         parts = [f"режим {er.get('regime')}"]
-    ks = er.get("kill_switch") or {}
-    if ks.get("active"):
-        p = ks.get("activation_price")
-        parts.append(f"Kill Switch активен от {ddmm(ks.get('since'))}" + (f", цена {num(p, 2)}" if p is not None else ""))
-    elif er.get("model_ran"):
-        parts.append("Kill Switch не е активен")
+    # Kill Switch не е на стъклото (решение на Ц., 23.11.2026)
     names = er.get("tiles_without_friday_names") or []
     parts.append("без петъка: " + (", ".join(names) if names else "няма"))
     return " · ".join(parts)
@@ -311,13 +370,12 @@ def doors(week_end: str) -> list:
 
 # ── страницата ──────────────────────────────────────────────────────────────
 CSS = """
-:root{--bg:#f6f5f1;--card:#ffffff;--ink:#1d1f23;--mut:#5d6470;--line:#dcd9d1;
---k:#d23b3a;--kbg:#fbe9e7;--n:#b77a07;--nbg:#fdf3dc;--c:#6b7480;--cbg:#ffffff;--g:#8a8f98;--gbg:#ecebe7;--a:#1f5fae}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121417;--card:#1b1e23;--ink:#e7e8ea;
---mut:#9aa2ad;--line:#2d3138;--k:#ff6b63;--kbg:#3a1d1d;--n:#f0b440;--nbg:#3a2e14;--c:#9aa2ad;--cbg:#1b1e23;--g:#7d838c;
---gbg:#24272c;--a:#7fb2ff}}
-:root[data-theme="dark"]{--bg:#121417;--card:#1b1e23;--ink:#e7e8ea;--mut:#9aa2ad;--line:#2d3138;--k:#ff6b63;
---kbg:#3a1d1d;--n:#f0b440;--nbg:#3a2e14;--c:#9aa2ad;--cbg:#1b1e23;--g:#7d838c;--gbg:#24272c;--a:#7fb2ff}
+:root{--bg:#121417;--card:#1b1e23;--ink:#e7e8ea;--mut:#9aa2ad;--line:#2d3138;--k:#ff6b63;
+--kbg:#3a1d1d;--n:#f0b440;--nbg:#3a2e14;--c:#9aa2ad;--cbg:#1b1e23;--g:#7d838c;--gbg:#24272c;--a:#7fb2ff;
+--bar:#3a4048;--r1:#5b8def;--r2:#c9a227;--r3:#d0675f;--r4:#4fb08a}
+:root[data-theme="light"]{--bg:#f6f5f1;--card:#ffffff;--ink:#1d1f23;--mut:#5d6470;--line:#dcd9d1;
+--k:#d23b3a;--kbg:#fbe9e7;--n:#b77a07;--nbg:#fdf3dc;--c:#6b7480;--cbg:#ffffff;--g:#8a8f98;--gbg:#ecebe7;--a:#1f5fae;
+--bar:#e3e1db;--r1:#2f6bd6;--r2:#a8840f;--r3:#b8463e;--r4:#2e8a66}
 *{box-sizing:border-box}
 body{margin:0;overflow-wrap:anywhere;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 font-variant-numeric:tabular-nums}
@@ -363,6 +421,23 @@ display:flex;justify-content:space-between;gap:6px}
 .doors{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px}
 .doors span{color:var(--mut)}
 .foot{margin-top:18px;font-size:12px;color:var(--mut)}
+.verdict{font-size:14px;margin-top:3px}.verdict b{font-weight:650}
+.areas{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 8px;align-items:center;font-size:12px;color:var(--mut);margin:3px 0}
+.areas .b{height:7px;background:var(--bar);border-radius:4px;overflow:hidden}
+.areas .b i{display:block;height:100%;background:var(--c)}
+.areas .b.s-krayno i{background:var(--k)}.areas .b.s-neobichayno i{background:var(--n)}
+.areas .b.s-sivo i{background:var(--g)}
+#t13{grid-column:1/-1}
+.trail{margin:6px 0 2px;max-width:760px}
+.trail .bars{display:flex;align-items:flex-end;gap:4px;height:84px;border-bottom:1px solid var(--line)}
+.trail .bars i{flex:1;min-width:0;border-radius:2px 2px 0 0;background:var(--r1)}
+.trail .regs{display:flex;gap:3px;font-size:11px;color:var(--mut);margin-top:3px}
+.trail .regs span{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;border-top:3px solid var(--r1);padding-top:2px}
+.trail .ends{display:flex;justify-content:space-between;font-size:11px;color:var(--mut)}
+.trail .ends b{color:var(--ink);font-size:13px}
+.rg1{background:var(--r1)!important;border-color:var(--r1)!important}.rg2{background:var(--r2)!important;border-color:var(--r2)!important}
+.rg3{background:var(--r3)!important;border-color:var(--r3)!important}.rg4{background:var(--r4)!important;border-color:var(--r4)!important}
+.trail .regs span.rg1,.trail .regs span.rg2,.trail .regs span.rg3,.trail .regs span.rg4{background:none!important}
 @media (max-width:700px){.changed{grid-template-columns:repeat(2,minmax(0,1fr))}.abroad{grid-template-columns:repeat(2,minmax(0,1fr))}
 .grid{grid-template-columns:minmax(0,1fr)}.top .tools{margin-left:0}}
 """
@@ -372,8 +447,7 @@ JS = """
 function get(){try{return localStorage.getItem('glass-theme')}catch(e){return null}}
 function set(v){try{localStorage.setItem('glass-theme',v)}catch(e){}}
 var s=get(),h=location.hash.slice(1);if(h==='dark'||h==='light')s=h;if(s)r.setAttribute('data-theme',s);
-if(b)b.onclick=function(){var cur=r.getAttribute('data-theme')||
-(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');var n=cur==='dark'?'light':'dark';
+if(b)b.onclick=function(){var cur=r.getAttribute('data-theme')||'dark';var n=cur==='dark'?'light':'dark';
 r.setAttribute('data-theme',n);set(n);};})();
 """
 
@@ -480,7 +554,7 @@ def text_page(lines: list) -> str:
     body = html.escape("\n".join(lines))
     return ('<!doctype html><html lang="bg"><head><meta charset="utf-8"><meta name="viewport" '
             'content="width=device-width,initial-scale=1"><title>Илюминаторът, текст</title><style>'
-            ':root{--bg:#f6f5f1;--ink:#1d1f23}@media (prefers-color-scheme:dark){:root{--bg:#121417;--ink:#e7e8ea}}'
+            ':root{--bg:#121417;--ink:#e7e8ea}'
             'body{margin:0;overflow-wrap:anywhere;background:var(--bg);color:var(--ink)}pre{white-space:pre-wrap;word-break:break-word;'
             'font:14px/1.5 ui-monospace,Consolas,monospace;padding:14px 16px;max-width:1000px;margin:0 auto}'
             '</style></head><body><pre>' + body + '</pre><p style="padding:0 16px"><a href="index.html">'
@@ -492,8 +566,7 @@ def archive_index(out: Path) -> str:
     items = "".join(f'<li><a href="{w}.html">{ddmm(w, True)}</a> · <a href="{w}.txt">текст</a></li>' for w in weeks)
     return ('<!doctype html><html lang="bg"><head><meta charset="utf-8"><meta name="viewport" '
             'content="width=device-width,initial-scale=1"><title>Илюминаторът, седмиците</title><style>'
-            ':root{--bg:#f6f5f1;--ink:#1d1f23;--a:#1f5fae}@media (prefers-color-scheme:dark){:root{--bg:#121417;'
-            '--ink:#e7e8ea;--a:#7fb2ff}}body{margin:0;overflow-wrap:anywhere;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,'
+            ':root{--bg:#121417;--ink:#e7e8ea;--a:#7fb2ff}body{margin:0;overflow-wrap:anywhere;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,'
             'sans-serif;padding:14px 16px}a{color:var(--a)}</style></head><body><h1>Илюминаторът: седмиците</h1>'
             f'<ul>{items}</ul><p><a href="../index.html">стъклото за последната седмица</a></p></body></html>')
 
