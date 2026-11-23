@@ -1,0 +1,116 @@
+<!doctype html><html lang="bg"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Илюминаторът</title><style>
+:root{--bg:#f6f5f1;--card:#ffffff;--ink:#1d1f23;--mut:#5d6470;--line:#dcd9d1;
+--k:#d23b3a;--kbg:#fbe9e7;--n:#b77a07;--nbg:#fdf3dc;--c:#6b7480;--cbg:#ffffff;--g:#8a8f98;--gbg:#ecebe7;--a:#1f5fae}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121417;--card:#1b1e23;--ink:#e7e8ea;
+--mut:#9aa2ad;--line:#2d3138;--k:#ff6b63;--kbg:#3a1d1d;--n:#f0b440;--nbg:#3a2e14;--c:#9aa2ad;--cbg:#1b1e23;--g:#7d838c;
+--gbg:#24272c;--a:#7fb2ff}}
+:root[data-theme="dark"]{--bg:#121417;--card:#1b1e23;--ink:#e7e8ea;--mut:#9aa2ad;--line:#2d3138;--k:#ff6b63;
+--kbg:#3a1d1d;--n:#f0b440;--nbg:#3a2e14;--c:#9aa2ad;--cbg:#1b1e23;--g:#7d838c;--gbg:#24272c;--a:#7fb2ff}
+*{box-sizing:border-box}
+body{margin:0;overflow-wrap:anywhere;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+font-variant-numeric:tabular-nums}
+.wrap{max-width:1280px;margin:0 auto;padding:14px 16px 40px}
+a{color:var(--a)}
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin-bottom:10px}
+.top h1{font-size:20px;margin:0}.top .wk{color:var(--mut)}
+.top .tools{margin-left:auto;display:flex;gap:12px;align-items:center;font-size:14px}
+button.th{font:inherit;font-size:13px;background:var(--card);color:var(--ink);border:1px solid var(--line);
+border-radius:6px;padding:3px 9px;cursor:pointer}
+.band{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:14px}
+.band b{font-weight:600}
+.lbl{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin:16px 0 6px}
+.changed{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.chip{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:6px;padding:6px 9px}
+.chip.s-krayno{border-left-color:var(--k)}.chip.s-neobichayno{border-left-color:var(--n)}
+.chip .t{font-size:12px;color:var(--mut)}.chip .v{font-size:17px;font-weight:600}
+.small{font-size:13px;color:var(--mut)}
+details summary{cursor:pointer;color:var(--mut);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.tile{background:var(--cbg);border:1px solid var(--line);border-top:5px solid var(--c);border-radius:8px;
+padding:9px 11px;display:flex;flex-direction:column;gap:3px}
+.tile header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 8px}
+.tile h3{margin:0;font-size:15px}
+.tile .st{font-size:12px;font-weight:600;padding:1px 7px;border-radius:10px;border:1px solid var(--line);white-space:nowrap}
+.tile p{margin:0}
+.tile .mem{font-size:14px;margin-top:3px}
+.tile .val .big{font-size:19px;font-weight:650}
+.tile .anc{font-size:13px;color:var(--mut)}
+.tile .extra,.tile .greym,.tile .greywhy{font-size:13px;color:var(--mut)}
+.tile .meta{font-size:12px;color:var(--mut);margin-top:auto;padding-top:4px}
+.tile .optics{font-size:12px;display:flex;gap:10px;flex-wrap:wrap}
+.tile .optics:empty{display:none}
+.s-krayno{border-top-color:var(--k);background:var(--kbg)}.s-krayno .st{color:var(--k);border-color:var(--k)}
+.s-neobichayno{border-top-color:var(--n);background:var(--nbg)}.s-neobichayno .st{color:var(--n);border-color:var(--n)}
+.s-spokoyno .st{color:var(--c)}
+.s-sivo{border-top-color:var(--g);background:repeating-linear-gradient(135deg,var(--gbg) 0 8px,var(--card) 8px 16px);
+color:var(--mut)}.s-sivo .st{color:var(--g)}
+.abroad{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.ab{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:13px;
+display:flex;justify-content:space-between;gap:6px}
+.ab b{font-weight:600}
+.doors{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px}
+.doors span{color:var(--mut)}
+.foot{margin-top:18px;font-size:12px;color:var(--mut)}
+@media (max-width:700px){.changed{grid-template-columns:repeat(2,minmax(0,1fr))}.abroad{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid{grid-template-columns:minmax(0,1fr)}.top .tools{margin-left:0}}
+</style></head><body><div class="wrap">
+<div class="top"><h1>Илюминаторът</h1><span class="wk">седмицата до петък 20.11.2026</span><span class="tools"><a href="../staklo/2026-11-20.txt">като текст</a><a href="../staklo/index.html">предишните седмици</a><button class="th" id="th" type="button">тема</button></span></div>
+<div data-zone="lights">
+<div class="band" id="row0"><b>Машинното отделение.</b> режим REFLATION · Kill Switch активен от 20.11, цена 689,81 · без петъка: Финансирането на хазната, Еврозоната, Китай, Япония</div>
+<div class="lbl">1. Какво се промени от миналия петък</div><div class="changed" id="row1">
+<div class="chip s-krayno"><div class="t">Кредит и нерви</div><div>VIX</div><div class="v">+16,59 т.</div></div>
+<div class="chip s-krayno"><div class="t">Секторите</div><div>XLF</div><div class="v">−7,00%</div></div>
+<div class="chip s-krayno"><div class="t">Акциите</div><div>SPY</div><div class="v">−8,56%</div></div>
+<div class="chip s-krayno"><div class="t">Суровините</div><div>Мед (CPER, фонд, не спот)</div><div class="v">−9,88%</div></div>
+<div class="chip s-krayno"><div class="t">Кредит и нерви</div><div>CWB</div><div class="v">−5,85%</div></div>
+</div>
+<p class="small">Подредени по това колко необичайна е промяната спрямо собствената история на члена; най-много два от едно семейство. 
+<details style="display:inline"><summary>още 25 члена с необичайна промяна останаха отвън</summary>IAI, RSP, Ширина: над 200-дневната, XLI, Ширина: над 50-дневната, QQQ, XLK, XLV, XLB, KRE, SMH, 10г инфлационни очаквания, PFF, Злато (LBMA PM), Спред на високодоходните (HY OAS), IYT, IWM, XLC, KBE, XLY, Сребро (SLV), 2г ДЦК, XLE, 10г ДЦК, Фед, заложено след 12 мес. (ZQ)</details>
+</p>
+<div class="band" id="row1a"><b>1а. Защо.</b> до VIX: причината е в черновата на новините от 21.11 (чернова, втора ръка); редът с нея още не е пренесен в светлините. <a href="file:///C:/Tsachev%20Knowledge%20OS/tsachev-ops/news/2026-11-21.md">черновата</a></div>
+<div class="lbl">2. Пазарите</div><div class="grid" id="row2">
+<article class="tile s-neobichayno" id="t1" data-tile="1"><header><h3>Цената на парите</h3><span class="st">необичайно</span></header><p class="mem">10г инфлационни очаквания</p><p class="val"><span class="big">−9,0 б.т.</span> <span class="anc">дъно за година</span></p><p class="meta">данни към петъка · канонът на data-core</p><nav class="optics" data-optics="1"></nav></article>
+<article class="tile s-spokoyno" id="t2" data-tile="2"><header><h3>Финансирането на хазната</h3><span class="st">спокойно</span></header><p class="mem">Fed plumbing</p><p class="val"><span class="anc">флаг на уреда: жълт</span></p><p class="meta">данни към 19.11 · 1 д. · радарът за финансирането</p><nav class="optics" data-optics="2"></nav></article>
+<article class="tile s-krayno" id="t3" data-tile="3"><header><h3>Кредит и нерви</h3><span class="st">крайно</span></header><p class="mem">CWB</p><p class="val"><span class="big">−5,85%</span> <span class="anc">дъно за година</span></p><p class="meta">данни към петъка · ценовият архив</p><nav class="optics" data-optics="3"><a class="opt" href="../ekran.html#talpata">барометърът →</a></nav></article>
+<article class="tile s-neobichayno" id="t4" data-tile="4"><header><h3>Доларът</h3><span class="st">необичайно</span></header><p class="mem">EURUSD</p><p class="val"><span class="big">−0,73%</span> <span class="anc">дъно за година</span></p><p class="meta">данни към петъка · ценовият архив</p><nav class="optics" data-optics="4"></nav></article>
+<article class="tile s-krayno" id="t5" data-tile="5"><header><h3>Акциите</h3><span class="st">крайно</span></header><p class="mem">SPY</p><p class="val"><span class="big">−8,56%</span> <span class="anc">z −5,56 спрямо обичайната седмица</span></p><p class="meta">данни към петъка · ценовият архив</p><nav class="optics" data-optics="5"><a class="opt" href="../ekran.html#etazh3">платното →</a></nav></article>
+<article class="tile s-krayno" id="t6" data-tile="6"><header><h3>Секторите</h3><span class="st">крайно</span></header><p class="mem">XLF</p><p class="val"><span class="big">−7,00%</span> <span class="anc">z −7,22 спрямо обичайната седмица</span></p><p class="meta">данни към петъка · ценовият архив</p><nav class="optics" data-optics="6"><a class="opt" href="../ekran.html#etazh3">платното →</a><a class="opt" href="../sectors.html">секторите →</a></nav></article>
+<article class="tile s-neobichayno" id="t7" data-tile="7"><header><h3>Суровините</h3><span class="st">необичайно</span></header><p class="mem">Мед (CPER, фонд, не спот)</p><p class="val"><span class="big">−9,88%</span> <span class="anc">z −3,70 спрямо обичайната седмица</span></p><p class="meta">данни към петъка · ценовият архив</p><nav class="optics" data-optics="7"><a class="opt" href="../ekran.html#etazh3">платното →</a></nav></article>
+</div>
+<div class="lbl">2а. Чужбина, под „Акциите“: десетте местни индекса, седмична промяна в местна валута</div><div class="abroad" id="row2a">
+<div class="ab"><span>STOXX 600</span><b>−5,80%</b></div>
+<div class="ab"><span>DAX</span><b>−7,28%</b></div>
+<div class="ab"><span>CAC 40</span><b>−5,27%</b></div>
+<div class="ab"><span>FTSE 100</span><b>−5,10%</b></div>
+<div class="ab"><span>Nikkei 225</span><b>−7,70%</b></div>
+<div class="ab"><span>KOSPI</span><b>−7,95%</b></div>
+<div class="ab"><span>TAIEX</span><b>−17,50%</b></div>
+<div class="ab"><span>Hang Seng</span><b>−5,19%</b></div>
+<div class="ab"><span>SSE Composite</span><b>−2,77%</b></div>
+<div class="ab"><span>Nifty 50</span><b>+2,61%</b></div>
+</div>
+<div class="lbl">3. Икономиката и централните банки</div><div class="grid" id="row3">
+<article class="tile s-spokoyno" id="t8" data-tile="8"><header><h3>САЩ</h3><span class="st">спокойно</span></header><p class="mem">леща инфлация</p><p class="val"><span class="anc">z −0,45 спрямо нормалното за лещата</span></p><p class="extra">светят 2 от 75 серии; най-силна: Инфлационни очаквания (Michigan, 1 година)</p><p class="meta">данни към петъка · таблото на САЩ</p><nav class="optics" data-optics="8"></nav></article>
+<article class="tile s-spokoyno" id="t9" data-tile="9"><header><h3>Еврозоната</h3><span class="st">спокойно</span></header><p class="mem">леща външен сектор</p><p class="val"><span class="anc">z +0,58 спрямо нормалното за лещата</span></p><p class="extra">светят 4 от 51 серии; най-силна: Bund 2Y benchmark yield</p><p class="meta">данни към 19.11 · 0 д. · таблото на еврозоната</p><nav class="optics" data-optics="9"></nav></article>
+<article class="tile s-spokoyno" id="t10" data-tile="10"><header><h3>Китай</h3><span class="st">спокойно</span></header><p class="mem">леща имоти</p><p class="val"><span class="anc">флаг на уреда: свиване</span></p><p class="extra">светят 1 от 39 серии; най-силна: Нови RMB кредити (месечно, CNY 100M)</p><p class="greym">сиви членове: леща труд</p><p class="meta">данни към 01.10 · 20 д. · таблото на Китай</p><nav class="optics" data-optics="10"></nav></article>
+<article class="tile s-neobichayno" id="t11" data-tile="11"><header><h3>Япония</h3><span class="st">необичайно</span></header><p class="mem">леща кредит</p><p class="val"><span class="anc">z −5,51 спрямо нормалното за лещата</span></p><p class="extra">лупа няма: таблото няма файл със сериите</p><p class="meta">данни към 13.11 · 7 д. · таблото на Япония</p><nav class="optics" data-optics="11"></nav></article>
+<article class="tile s-neobichayno" id="t12" data-tile="12"><header><h3>Централните банки</h3><span class="st">необичайно</span></header><p class="mem">Фед, заложено след 12 мес. (ZQ)</p><p class="val"><span class="big">−32,0 б.т.</span> <span class="anc">z −2,09 спрямо обичайната седмица</span></p><p class="greym">сиви членове: SOFR, заложено след 24 мес. (SR3)</p><p class="meta">данни към петъка · пътят от фючърсите</p><nav class="optics" data-optics="12"></nav></article>
+</div>
+<div class="lbl">4. Моделът</div><div class="grid" id="row4">
+<article class="tile s-krayno" id="t13" data-tile="13"><header><h3>Моделът</h3><span class="st">крайно</span></header><p class="mem">Kill Switch</p><p class="val"><span class="anc">активен</span></p><p class="extra">режимът REFLATION: същият режим като предната седмица (REFLATION)</p><p class="meta">данни към петъка · седмичният ход на модела</p><nav class="optics" data-optics="13"><a class="opt" href="../vrm.html">моделът →</a></nav></article>
+</div>
+</div>
+<div data-zone="doors"><div class="lbl">Вратите надолу</div><div class="doors"><a href="../ekran.html">платното и етажите на седмичния екран</a><a href="../vrm.html">моделът</a><a href="../sectors.html">секторите</a>
+<span><a href="file:///C:/Projects/data-core/migrations/m_pulse/out/pulse_2026-11-20.md">Пулсът, дайджестът</a> <span>последен изход 20.11</span></span>
+<span><a href="file:///C:/Projects/data-core/migrations/m_desk/pages/2026-W45.md">Бюрото, първата страница</a> <span>последен изход 06.11</span></span>
+<span><a href="file:///C:/Projects/data-core/migrations/e2_dashboard/e2.html">Вратата на кокпита</a> <span>последен изход 21.11</span></span>
+</div><p class="foot">Стъклото подрежда файла със светлините на линийката, без своя сметка; вратите към Пулса, бюрото и кокпита се отварят само на този компютър.</p></div>
+</div><script>
+(function(){var r=document.documentElement,b=document.getElementById('th');
+function get(){try{return localStorage.getItem('glass-theme')}catch(e){return null}}
+function set(v){try{localStorage.setItem('glass-theme',v)}catch(e){}}
+var s=get(),h=location.hash.slice(1);if(h==='dark'||h==='light')s=h;if(s)r.setAttribute('data-theme',s);
+if(b)b.onclick=function(){var cur=r.getAttribute('data-theme')||
+(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');var n=cur==='dark'?'light':'dark';
+r.setAttribute('data-theme',n);set(n);};})();
+</script></body></html>

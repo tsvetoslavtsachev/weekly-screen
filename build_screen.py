@@ -241,7 +241,7 @@ def barometer_card(baro):
     direction_grouped + броячите + кривата — нула хардкоднати числа."""
     link = '<a class="dlink" href="https://tsvetoslavtsachev.github.io/ETF-rotationradar/" target="_blank">пълният радар →</a>'
     if baro is None:
-        return ('<div class="slot">ТЪЛПАТА (Барометърът): барометърът недостъпен — '
+        return ('<div class="slot" id="talpata">ТЪЛПАТА (Барометърът): барометърът недостъпен — '
                 f'barometer_feed.json не се чете · {link}</div>')
     snap = baro["snapshot"]; conf = baro["confluence"]
     total = len(snap)
@@ -283,7 +283,7 @@ def barometer_card(baro):
                         f'<span class="badge2 {tzc}">{tzw}</span> · {t10.get("note","")}</div>')
     ctx_html = ('<div class="bctx"><b>Контекст, не глас</b> — двата реда оцветяват прочита, не влизат в брояча:'
                 + "".join(ctx_rows) + '</div>') if ctx_rows else ''
-    return (f'<details class="baro"><summary><span class="bk">ТЪЛПАТА (Барометърът) '
+    return (f'<details class="baro" id="talpata"><summary><span class="bk">ТЪЛПАТА (Барометърът) '
             f'<span class="tag">наблюдение, не сигнал</span> <span class="small">до {asof} · клик за 10-те гласа</span></span>'
             f'<span class="bl">{verdict}</span></summary>'
             f'<table class="scr bscr">{head}{"".join(rows)}</table>'
@@ -637,7 +637,7 @@ def floor0(sat, brief, core):
             f'<span class="v"><span class="b up">{core["align"]:.0f}/{core["align_total"]}</span></span></div>'
             f'<div class="foot">кой крепи тези {core["align"]:.0f} от {core["align_total"]} → етаж 2 · възрастта на епизода → етаж 1</div>'
             f'<div class="slot"><a class="dlink" href="vrm.html">→ Отвори пълния VRM екран</a> <span class="small">(мандат 17 изпълнен · билд: build_vrm_screen.py, пуска се СЛЕД build_screen.py)</span></div></div>')
-    return (f'<div class="floor"><div class="fh"><span class="n">ЕТАЖ 0</span>'
+    return (f'<div class="floor" id="etazh0"><div class="fh"><span class="n">ЕТАЖ 0</span>'
             f'<span class="t">Икономиката — четирите лещи (клик за чекмеджето)</span>'
             f'<span class="d" title="Лицето: режим + под-лещите (health-скор 0–100; 50 = близката норма) + брой вътрешни дивергенции. Кликът отваря цялата дъска: всички под-лещи, упоритите аномалии (по |z| — размер на отклонението, без посока), брифингът, линкът към дашборда.">ⓘ</span></div>'
             f'<div class="lens4">{faces}</div>'
@@ -708,7 +708,7 @@ def floor1(age, core, storms=None):
     # под прага (margin < 0) лентата тръгва наляво от чертата и е червена; беше заковано „up“ (KS епизод 11, 21.11.2026)
     kc = "up" if marg >= 0 else "dn"; rl, rw = min(mp,20), abs(mp-20)
     g = core["gms"]
-    return (f'<div class="floor"><div class="fh"><span class="n">ЕТАЖ 1</span><span class="t">Режимът и възрастта му</span>'
+    return (f'<div class="floor" id="etazh1"><div class="fh"><span class="n">ЕТАЖ 1</span><span class="t">Режимът и възрастта му</span>'
             f'<span class="d" title="Възрастта на епизода върху историческото разпределение ({age["n"]} рефлационни епизода от 2007). KS = дистанция до предпазителя.">ⓘ</span></div>'
             f'<div class="row"><span class="nm">{age["regime"]} — възраст <span class="small">от {age["start"]} · среза {age["asof"]}</span></span>'
             f'<div class="track" title="{age["age"]} седмици · медиана {age["median"]:.0f}с (чертата) · най-дълъг {age["max"]}с">'
@@ -741,7 +741,7 @@ def floor2(votes):
                     f'<div class="range {"dn" if cls=="against" else ("warn" if cls=="swing" else "up")}" style="left:0;width:{max(w,2):.0f}%"></div>'
                     f'<div class="dot {col}" style="left:{max(w,2):.0f}%"></div></div>'
                     f'<span class="v"><span class="badge2 {cls}">{v["class"]}</span> <span class="small">{w:.0f}% · серия {v["end_streak"]}с {STATE_BG.get(v["last_state"],"")}{extra}</span></span></div>')
-    return (f'<div class="floor"><div class="fh"><span class="n">ЕТАЖ 2</span><span class="t">Гласовете под режима — кой го крепи</span>'
+    return (f'<div class="floor" id="etazh2"><div class="fh"><span class="n">ЕТАЖ 2</span><span class="t">Гласовете под режима — кой го крепи</span>'
             f'<span class="d" title="Ретро-погледът 8×13 [ВЪТРЕШЕН ПОГЛЕД]: % седмици Съгласен + класификация + текуща серия. Данните са със среза на ретро анализа (03.07).">ⓘ</span></div>'
             + "\n".join(rows) +
             f'<div class="hero" style="margin:10px 0 0"><div class="tile"><div class="k">M-INTER</div><div class="n">2 флага</div><div class="m">GLD/TLT · GLD/SPY</div></div>'
@@ -812,7 +812,7 @@ def floor4(bridge, flat, radar, mtx):
         return (f'<div class="scard"><h3>{etf} {gics} <span class="b {tone}" style="font-size:12px">{lbl}: {xl[etf]:+.2f}%</span></h3>'
                 + breakdown_html(bd)
                 + "\n".join(cr) + f'<div class="meta">{" · ".join(meta)}</div></div>')
-    return (f'<div class="floor"><div class="fh"><span class="n">ЕТАЖ 4</span><span class="t">РАЗБИВКАТА на сектора</span>'
+    return (f'<div class="floor" id="etazh4"><div class="fh"><span class="n">ЕТАЖ 4</span><span class="t">РАЗБИВКАТА на сектора</span>'
             f'<span class="d" title="За най-силния и най-слабия сектор на седмицата (избрани от платното): пет реда разбивка — състав по рафтове (1м квадрант), ротационен поток, дисперсия на ранга, ножове (Е6б: QD и abs&lt;50), S10 прочит на секторния ETF — и НАКРАЯ трите имена от Е6б моста (bridge.json, ротация към {bridge.get("rotation_as_of","?")}, read-only). Наблюдение, не сигнал: НЕ избира сектора и НЕ казва купи.">ⓘ</span></div>'
             f'<div class="cards2">{card(top,"up")}{card(bot,"dn")}</div>'
             f'<div class="foot" style="margin-top:9px"><a class="dlink" href="sectors.html">→ Разбивката за всичките 11 сектора</a></div>'
@@ -909,7 +909,7 @@ def main():
 {floor0(sat,brief,core)}
 {floor1(age,core,storms)}
 {floor2(votes)}
-<div class="floor"><div class="fh"><span class="n">ЕТАЖ 3</span><span class="t">Пазарното платно — лицето</span>
+<div class="floor" id="etazh3"><div class="fh"><span class="n">ЕТАЖ 3</span><span class="t">Пазарното платно — лицето</span>
 <span class="d" title="Лицето: 7 постоянни реда (ядро) + до 3 госта за седмицата (|z| ≥ 1.5σ по метода на сателита). Всеки актив като свещ: лентата = диапазонът low→high спрямо предишното затваряне; точката = затварянето. Общата скала per колона се смята САМО от редовете на лицето. Пълното платно (31 актива по групи) е в сгъвката отдолу.">ⓘ</span></div>
 <table class="scr">{scr_head(fwlo,fwhi,fmlo,fmhi)}
 {floor3_face_rows(core_assets,guest_assets,fwlo,fwhi,fmlo,fmhi)}
@@ -952,7 +952,7 @@ def main():
             "top3":round(bd["top3"],2),"bot3":round(bd["bot3"],2),
             "avoid":bd["knives"],"s10_verdict":v10})
 
-    (OUT/"index.html").write_text(html, encoding="utf-8")
+    (OUT/"ekran.html").write_text(html, encoding="utf-8")
     (OUT/"screen_data.json").write_text(json.dumps({"week":WEEK_LABEL,"groups":data,"checks":checks,"checks_z":checks_z,
         "z":{k:round(v,4) for k,v in zmap.items()},"guests":guest_ticks,
         "sector_breakdown":sb_payload,
