@@ -105,3 +105,85 @@ def test_date_formats_from_instruments():
     assert bo.norm_date("29.06.2026 16:37") == "2026-06-29"
     assert bo.norm_date("2026-10") == "2026-10-31"
     assert bo.norm_date("W47 · 16-20.11.2026") == "2026-11-20"
+
+
+# ── Ж1: машинният път във видимия текст (връщането от ИЛЮД1, 23.11.2026) ─────
+def test_zh1_no_machine_path_in_visible_text(built):
+    out, d = built
+    vo._cache.clear()
+    _, cnt = vo.g4(out, WEEK, d)
+    assert cnt["paths"] == 0
+
+
+def test_zh1_catches_an_inserted_path(built, tmp_path):
+    out, d = built
+    import shutil
+    shutil.copytree(out / "staklo", tmp_path / "staklo")
+    shutil.copytree(out / "optika", tmp_path / "optika")
+    p = tmp_path / "optika" / WEEK / "ul-arch-px_spy_daily.html"
+    txt = p.read_text(encoding="utf-8")
+    new = txt.replace("уредът: ценовият архив", r"уредът: C:\Projects\price-archive\archive\px_spy_daily", 1)
+    assert new != txt
+    p.write_text(new, encoding="utf-8")
+    vo._cache.clear()
+    bad, cnt = vo.g4(tmp_path, WEEK, d)
+    assert cnt["paths"] == 1 and any(b.startswith("Ж1 ul-arch-px_spy_daily.html") for b in bad)
+
+
+def test_zh1_command_carries_its_folder():
+    v = bo.ured_view("s9_tech", WEEK)
+    h = bo.ured_html(v)
+    assert "папка:" not in h
+    assert r'<code class="cmd">cd C:\Projects\data-core; python -X utf8 migrations\drill\s9_tech.py</code>' in h
+
+
+# ── Ж2: вратата на публикувания екран ────────────────────────────────────────
+def test_zh2_door_is_hidden_unless_local(built):
+    out, _ = built
+    for page in (out / "index.html", out / "staklo" / f"{WEEK}.html"):
+        html = page.read_text(encoding="utf-8")
+        doors = re.findall(r"<a [^>]*optika/[^>]*>", html)
+        assert len(doors) == 13
+        assert all(" hidden" in a and "data-local-only" in a for a in doors)
+        # единственото място, което маха hidden, е под location.protocol==='file:'
+        assert "removeAttribute('hidden')" in html
+        js = html[html.index("location.protocol==='file:'"):]
+        assert js.index("removeAttribute('hidden')") < js.index("})();")
+
+
+def _chrome():
+    for c in (r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+              r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"):
+        if Path(c).exists():
+            return c
+    return None
+
+
+def _visible_doors(chrome, url):
+    import subprocess
+    r = subprocess.run([chrome, "--headless=new", "--disable-gpu", "--virtual-time-budget=3000", "--dump-dom", url],
+                       capture_output=True, text=True, encoding="utf-8", timeout=120)
+    doors = re.findall(r"<a [^>]*data-optics-door[^>]*>", r.stdout)
+    return len(doors), sum(1 for a in doors if "hidden" not in a)
+
+
+def test_zh2_published_view_shows_no_door(built):
+    """Истински браузър: през http (както на публикувания екран) вратите са скрити; от файл се виждат."""
+    chrome = _chrome()
+    if not chrome:
+        pytest.skip("няма Chrome или Edge")
+    import functools
+    import http.server
+    import threading
+    out, _ = built
+    h = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(out))
+    h.log_message = lambda *a: None
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), h)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        n_http, vis_http = _visible_doors(chrome, f"http://127.0.0.1:{srv.server_address[1]}/index.html")
+    finally:
+        srv.shutdown()
+    n_file, vis_file = _visible_doors(chrome, (out / "index.html").as_uri())
+    assert n_http == 13 and vis_http == 0
+    assert n_file == 13 and vis_file == 13

@@ -155,6 +155,13 @@ def ured_view(key: str, week_end: str, cat: dict | None = None) -> dict:
             "script": u.get("script"), "data_date": data_date, "how": u.get("how", "")}
 
 
+def full_cmd(v: dict) -> str:
+    """Командата за копиране с папката си, за PowerShell (Ж1: пътят стои само в командата)."""
+    cwd = str(v["cwd"])
+    cwd = f'"{cwd}"' if " " in cwd else cwd
+    return f"cd {cwd}; {v['cmd']}"
+
+
 STATUS_BG = {"zhiv": "жив", "zastoyal": "застоял", "zamrazen": "замразен", "bez": "без дата",
              "doc": "документ", "poiskane": "по поискване"}
 
@@ -178,9 +185,9 @@ def ured_html(v: dict) -> str:
     if v["how"]:
         parts.append(f'<span class="unote">{e(v["how"])}</span>')
     if v["cmd"]:
-        parts.append(f'<span class="cmdl"><code class="cmd">{e(v["cmd"])}</code>'
-                     f'<button class="copy" type="button" data-cmd="{e(v["cmd"])}">копирай</button></span>'
-                     f'<span class="unote">папка: {e(str(v["cwd"]))}</span>')
+        full = full_cmd(v)
+        parts.append(f'<span class="cmdl"><code class="cmd">{e(full)}</code>'
+                     f'<button class="copy" type="button" data-cmd="{e(full)}">копирай</button></span>')
     return (f'<div class="ured u-{v["status"]}" data-zone="ured" data-ured="{e(v["key"])}" '
             f'data-date="{e(v["date"] or "")}" data-age="{"" if v["age"] is None else v["age"]}" '
             f'data-data-date="{e(v["data_date"] or "")}"'
@@ -668,8 +675,11 @@ def street_page(ctx: Ctx, s: dict) -> str:
     ten = [(d, v) for d, v in pts if d >= (dt.date.fromisoformat(we) - dt.timedelta(days=3653)).isoformat()]
     tail = pts[-13:]
     rows = "".join(f'<tr><td class="n">{e(bg.ddmm(d, True))}</td><td class="n">{e(fmt(v))}</td></tr>' for d, v in reversed(tail))
-    body = (f'<div class="head" data-zone="chrome"><h1>{e(s["title"])}</h1><p class="small">серията {e(str(s["spec"][-1]))} · '
-            f'уредът: {e(str(s["src"]))}</p></div>'
+    sid = str(s["spec"][1] if s["spec"][0] in ("path", "canon", "arch", "baro", "breadth", "lpr", "vrm")
+              else s["spec"][-1])
+    # Ж1: уредът с името си за човек, както на стъклото; пътят е само в data-src
+    body = (f'<div class="head" data-zone="chrome"><h1>{e(s["title"])}</h1><p class="small">серията {e(sid)} · '
+            f'уредът: {e(bg.source_name(str(s["src"]), sid))}</p></div>'
             f'<div data-zone="src" data-src="{e(str(s["src"]))}" data-street="series">'
             '<div class="lbl">Историята до петъка (до десет години)</div>' + svg_chart(ten)
             + '<div class="lbl">Последните наблюдения</div><table class="mem"><tr><th>дата</th><th>стойност</th></tr>'

@@ -11,7 +11,9 @@
   G4   числата: зоната „светлините“ срещу файла със светлините, зоната „src“ срещу файла на уреда
        в data-src, зоната „ured“: датата е тази, която уредът дава сега, а възрастта е петъкът
        минус нея;
-  G6   няма „прогноз“, „препоръ“, „сигнал“ във видимия текст.
+  G6   няма „прогноз“, „препоръ“, „сигнал“ във видимия текст;
+  Ж1   във видимия текст няма машинен път (диск с двоеточие, file:///); път има само в адресите на
+       връзките и в блока с готовата команда (<code>).
 
   python verify_optics.py --week-end 2026-11-20 [--out-dir ПАПКА] [--lights ФАЙЛ] [--mutate КЛЮЧ]
 Изход 0: всичко минава; 1: нещо не минава. Печата до 30 реда.
@@ -44,7 +46,7 @@ class Page(HTMLParser):
     def __init__(self):
         super().__init__()
         self.links, self.ids, self.ureds, self.streets = [], set(), [], 0
-        self.zone, self.stack, self.skip = "chrome", [], 0
+        self.zone, self.stack, self.skip, self.code = "chrome", [], 0, 0
         self.text: dict[str, list] = {}
         self.cur_ured = None
 
@@ -52,6 +54,8 @@ class Page(HTMLParser):
         a = dict(attrs)
         if tag in ("script", "style"):
             self.skip += 1
+        if tag == "code":
+            self.code += 1
         if "id" in a:
             self.ids.add(a["id"])
         if "data-street" in a:
@@ -71,13 +75,16 @@ class Page(HTMLParser):
     def handle_endtag(self, tag):
         if tag in ("script", "style"):
             self.skip -= 1
+        if tag == "code" and self.code:
+            self.code -= 1
         if tag == "div" and self.stack:
             self.zone, self.cur_ured = self.stack.pop()
 
     def handle_data(self, data):
         if self.skip:
             return
-        self.text.setdefault(self.zone, []).append(data)
+        # текстът в блока с командата е отделна зона: там пътят е част от командата (Ж1)
+        self.text.setdefault("cmd" if self.code else self.zone, []).append(data)
         if self.cur_ured is not None:
             self.cur_ured["_text"].append(data)
 
@@ -282,13 +289,15 @@ def fast_check(text: str, f: Facts, where: str) -> tuple[list, int]:
     return bad, n
 
 
+# Ж1: машинен път (C:\..., C:/..., file:///) във видимия текст извън блока с командата
+VIS_PATH_RE = re.compile(r"(?<![A-Za-z])[A-Za-z]:[\\/][^\s;,)]*|file:///\S*")
 AGE_RE = re.compile(r"данни към (\d{2})\.(\d{2})\.(\d{4}) · (\d+) д\.")
 
 
 def g4(out: Path, we: str, d: dict, cat: dict | None = None) -> tuple[list, dict]:
     folder = out / "optika" / we
     lf = Facts(*vg.file_facts(d))
-    bad, cnt = [], {"lights": 0, "src": 0, "ured": 0, "pages": 0}
+    bad, cnt = [], {"lights": 0, "src": 0, "ured": 0, "pages": 0, "paths": 0}
     fri = dt.date.fromisoformat(we)
     before = f"{(fri + dt.timedelta(days=1)).isoformat()}T23:59:59"
     now_dates: dict[str, str | None] = {}
@@ -301,6 +310,9 @@ def g4(out: Path, we: str, d: dict, cat: dict | None = None) -> tuple[list, dict
             for w in vg.BANNED:
                 if w in low:
                     bad.append(f"G6 {p.name}: думата „{w}“")
+            if zone != "cmd" and VIS_PATH_RE.search(text):
+                bad.append(f"Ж1 {p.name}: път във видимия текст: {VIS_PATH_RE.search(text)[0][:60]}")
+                cnt["paths"] += 1
             if zone == "lights":
                 b, n = fast_check(text, lf, p.name)
                 bad += b
@@ -396,7 +408,7 @@ def main() -> int:
         lines.append(f"G2: {len(r2)} пътя от пробата, най-дълъг {max(h for _, ps in r2 for _, h, _ in ps)} хода")
     lines += [f"G3: {x}" for x in r3]
     lines.append(f"G4: {c4['pages']} страници; числа от светлините {c4['lights']}, от уредите {c4['src']}, "
-                 f"дати на уреди {c4['ured']}")
+                 f"дати на уреди {c4['ured']}; Ж1: пътища във видимия текст {c4['paths']}")
     lines += [f"  НЕ: {x}" for x in bad[:30 - len(lines) - 1]]
     lines.append("  минава" if not bad else f"  не минава ({len(bad)})")
     print("\n".join(lines[:30]))

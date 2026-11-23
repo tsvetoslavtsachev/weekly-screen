@@ -267,8 +267,10 @@ def trail_html(trail: list) -> str:
 
 def tile_html(v: dict, base: str, week_end: str = "") -> str:
     e = html.escape
-    opt = (f'<a class="opt" href="{base}optika/{week_end}/t{v["id"]}.html" data-optics-door="1">оптиката →</a>'
-           if week_end else "")
+    # Ж2 (ИЛЮ5): оптиката е местен инструмент (optika/ е извън git); вратата е скрита и се показва
+    # само когато страницата е отворена от този компютър (file:), иначе на публикувания екран я няма
+    opt = (f'<a class="opt" href="{base}optika/{week_end}/t{v["id"]}.html" data-optics-door="1" '
+           f'data-local-only="1" hidden>оптиката →</a>' if week_end else "")
     opt += "".join(f'<a class="opt" href="{base}{h}">{e(lbl)} →</a>' for h, lbl in OPTICS.get(v["id"], []))
     body = []
     if v["state"] == "sivo" and v["why_grey"]:
@@ -452,7 +454,9 @@ function get(){try{return localStorage.getItem('glass-theme')}catch(e){return nu
 function set(v){try{localStorage.setItem('glass-theme',v)}catch(e){}}
 var s=get(),h=location.hash.slice(1);if(h==='dark'||h==='light')s=h;if(s)r.setAttribute('data-theme',s);
 if(b)b.onclick=function(){var cur=r.getAttribute('data-theme')||'dark';var n=cur==='dark'?'light':'dark';
-r.setAttribute('data-theme',n);set(n);};})();
+r.setAttribute('data-theme',n);set(n);};
+if(location.protocol==='file:'){var L=document.querySelectorAll('[data-local-only]');
+for(var i=0;i<L.length;i++)L[i].removeAttribute('hidden');}})();
 """
 
 
