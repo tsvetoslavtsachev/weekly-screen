@@ -221,6 +221,9 @@ HISTORY_PROV = ('Четирите факта са статични цитати 
 # ---------------------------------------------------------------- HTML фрагменти
 # Шапка chips (всичко от build данни)
 age_ord = f"{current_ep['weeks']}-а" if str(current_ep['weeks'])[-1] not in ('1',) else f"{current_ep['weeks']}-ва"
+# Етаж 2 е сгънат (Ц., 23.11.2026): фактите са статични; видим остава само живият ред
+HISTORY_LIVE = (f'<b>Живото:</b> текущият епизод ({esc(REGIME_BG[CUR_REG])}) е {age_ord} седмица срещу медиана '
+                f'{med_cur:.0f}с за режима; по втория факт само по себе си това не е знак за крехкост.')
 CHIPS = (
  f'<span class="chip"><b>ВЪЗРАСТ</b>{age_ord} седмица <span class="small">медианата за '
  f'{esc(REGIME_BG[CUR_REG].lower())} е {med_cur:.0f}с · макс {max_cur}с</span></span>'
@@ -348,6 +351,9 @@ h1{font-size:19px;margin:0 0 2px}
 .tag.obs{color:var(--reg-REFLATION);border-color:var(--reg-REFLATION)}
 .floor{background:var(--srf);border:1px solid var(--ring);border-radius:12px;padding:14px 16px;margin-bottom:14px}
 .fh{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+details.hist>summary{list-style:none;cursor:pointer}details.hist>summary::-webkit-details-marker{display:none}
+.hlive{margin:0 0 4px;font-size:14px}.hopen{color:var(--mut);font-size:12px;text-decoration:underline dotted}
+details.hist[open] .hopen{display:none}details.hist[open]>summary{margin-bottom:10px}
 .fh .n{color:var(--mut);font-size:11px;letter-spacing:1px}
 .fh .t{font-weight:700;font-size:15px}
 .fh .d{color:var(--mut);font-size:12px;margin-left:auto;cursor:help}
@@ -448,12 +454,13 @@ a.back{color:var(--warn);font-size:12px;text-decoration:none}
 </ul>
 </div>
 
-<div class="floor">
-<div class="fh"><span class="n">ЕТАЖ 2</span><span class="t">Какво казва историята — четирите факта от широкия тест</span>
+<details class="floor hist" id="istoriyata">
+<summary><div class="fh"><span class="n">ЕТАЖ 2</span><span class="t">Какво казва историята — четирите факта от широкия тест</span>
 <span class="d" title="Пре-регистриран тест върху цялата история (979 седмици, ex-warmup 875). Статични цитати с N/FDR — не се пресмятат наново.">ⓘ</span></div>
+<p class="hlive">__HISTORY_LIVE__</p><span class="hopen">четирите факта са едни и същи всяка седмица; отвори ги</span></summary>
 <div class="cards2">__HISTORY_CARDS__</div>
 <div class="hprov">__HISTORY_PROV__</div>
-</div>
+</details>
 
 <div class="floor">
 <div class="fh"><span class="n">ЕТАЖ 3</span><span class="t">Историята на режимите</span>
@@ -483,6 +490,7 @@ out = (TPL
   .replace('__ALIGN_ROW__', ALIGN_ROW)
   .replace('__ALIGN_SENT__', ALIGN_SENT)
   .replace('__STATE_LEG__', STATE_LEG)
+  .replace('__HISTORY_LIVE__', HISTORY_LIVE)
   .replace('__HISTORY_CARDS__', HISTORY_CARDS)
   .replace('__HISTORY_PROV__', esc(HISTORY_PROV))
   .replace('__RIBBON__', RIBBON)

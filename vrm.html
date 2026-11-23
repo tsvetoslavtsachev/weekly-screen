@@ -38,6 +38,9 @@ h1{font-size:19px;margin:0 0 2px}
 .tag.obs{color:var(--reg-REFLATION);border-color:var(--reg-REFLATION)}
 .floor{background:var(--srf);border:1px solid var(--ring);border-radius:12px;padding:14px 16px;margin-bottom:14px}
 .fh{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+details.hist>summary{list-style:none;cursor:pointer}details.hist>summary::-webkit-details-marker{display:none}
+.hlive{margin:0 0 4px;font-size:14px}.hopen{color:var(--mut);font-size:12px;text-decoration:underline dotted}
+details.hist[open] .hopen{display:none}details.hist[open]>summary{margin-bottom:10px}
 .fh .n{color:var(--mut);font-size:11px;letter-spacing:1px}
 .fh .t{font-weight:700;font-size:15px}
 .fh .d{color:var(--mut);font-size:12px;margin-left:auto;cursor:help}
@@ -138,12 +141,13 @@ a.back{color:var(--warn);font-size:12px;text-decoration:none}
 </ul>
 </div>
 
-<div class="floor">
-<div class="fh"><span class="n">ЕТАЖ 2</span><span class="t">Какво казва историята — четирите факта от широкия тест</span>
+<details class="floor hist" id="istoriyata">
+<summary><div class="fh"><span class="n">ЕТАЖ 2</span><span class="t">Какво казва историята — четирите факта от широкия тест</span>
 <span class="d" title="Пре-регистриран тест върху цялата история (979 седмици, ex-warmup 875). Статични цитати с N/FDR — не се пресмятат наново.">ⓘ</span></div>
+<p class="hlive"><b>Живото:</b> текущият епизод (Рефлация) е 2-а седмица срещу медиана 13с за режима; по втория факт само по себе си това не е знак за крехкост.</p><span class="hopen">четирите факта са едни и същи всяка седмица; отвори ги</span></summary>
 <div class="cards2"><div class="scard"><h3>Шареното гласуване е ЕХО на смяната, не предвестник <span class="b dn" style="font-size:11.5px">Н1 ПАДНА</span></h3><p class="hb">Хазардът при шарена коалиция е <b>0.340</b> — ПОД базовия 0.407 (при спокойна: 0.451). Механиката: гласовете се пре-сортират <b>след</b> смяната (среден churn 5.25 в първите 4 седмици на епизод срещу 3.55 по-късно) — а точно тогава следващата смяна е далеч. SPY forward също не различава шарено от спокойно (наклоните положителни, незначими).</p><div class="meta">N=875 ex-warmup седмици · H1a p=0.043 — значим, но в АНТИ-хипотезна посока · H1b ns · двата фалсификатора сработиха</div></div><div class="scard"><h3>Старите режими са дълголетниците — възрастта сама не тревожи <span class="b dn" style="font-size:11.5px">Н2 ПАДНА</span></h3><p class="hb">Хазард при възраст над медианата: <b>0.364</b> — ПОД базовия 0.407 (разлика −0.079, незначима, p=0.354). Режимите, надживели медианата за типа си, клонят да са дълголетниците (Рефлация 82с; Стагнация 74с) — веднъж „стари", те продължават, не се чупят. Живото: текущият епизод е 2-а седмица срещу медиана 13с — само по себе си това НЕ е сигнал за крехкост.</p><div class="meta">N=875 седмици / 57 епизода · p=0.354 (ns) · фалсификаторът сработи</div></div><div class="scard"><h3>Устойчивият дисидент сочи следващия режим <span class="b up" style="font-size:11.5px">Н3 ИЗДЪРЖА (условно)</span></h3><p class="hb">При <b>23 от 30 смени (76.7%)</b> поне един устойчив дисидент (8+ поредни седмици в едно разминаващо се състояние) е сочел към следващия режим по учебника си; на ниво наблюдение 31/61 = 50.8% срещу случайни 35.5% (~1.43×). Крехко: на строгите еднозначни прочити 18/41 = 43.9%. <b>Живото:</b> златото е точно такъв дисидент — по-слабо 11 поредни седмици, растежов учебник; исторически същият сетъп (злато UNDER в Рефлация) е уцелвал при смени №14 и №17 → Растеж.</p><div class="meta">N=61 наблюдения / 30 смени · p=0.014 · FDR PASS (q=0.10) · мощност ниска-умерена · наблюдение, не закон</div></div><div class="scard"><h3>Best-fit контекстът — информация, не мнозинство <span class="b warn" style="font-size:11.5px">Н4 СМЕСЕНА</span></h3><p class="hb">Когато вътрешната подредба пасва по-добре на друг режим 4+ поредни седмици, следващата смяна отива там в <b>15 от 35 случая (42.9%)</b> срещу случайни 27.6% — <b>1.55× над случайността</b>, но ПОД 50%: греши по-често, отколкото уцелва. Системно надкалква Криза/Дефлация в дългите опашки на Стагнация/Рефлация.</p><div class="meta">N=35 пламвания · p=0.025 · FDR PASS · пада по строгия 50% фалсификатор · отклонен към Криза</div></div></div>
 <div class="hprov">Четирите факта са статични цитати от пре-регистрирания широк тест върху цялата история, подписан на 10.07 — не се пресмятат наново при съботния билд.</div>
-</div>
+</details>
 
 <div class="floor">
 <div class="fh"><span class="n">ЕТАЖ 3</span><span class="t">Историята на режимите</span>
