@@ -18,7 +18,8 @@
   python build_glass.py --week-end 2026-11-20 [--lights ФАЙЛ] [--out-dir ПАПКА]
 
 Изход 0: построено. Изход 2: файлът със светлините липсва или е счупен; тогава стъклото
-за седмицата казва това на самата страница (всички плочки сиви), не мълчи.
+за седмицата казва това на самата страница (всички плочки сиви), не мълчи. Изход 3: стъклото
+е построено, но оптиката зад плочките (ИЛЮ5, build_optics.py, optika/<петък>/) падна.
 """
 from __future__ import annotations
 
@@ -52,7 +53,8 @@ FLAG_BG = {"amber": "жълт", "yellow": "жълт", "red": "червен", "gr
            "gray": "сива зона"}
 UNIT = {"bp": " б.т.", "pct": "%", "pts": " т."}
 
-# Оптиката зад плочката (листът, 5.1). Останалите плочки чакат ИЛЮ5: слотът стои празен.
+# Старите етажи зад плочката (листът, 5.1). Оптиката на ИЛЮ5 (optika/<петък>/t<N>.html) стои
+# първа на всяка плочка; тези връзки са до нея.
 OPTICS = {
     3: [("ekran.html#talpata", "барометърът")],
     5: [("ekran.html#etazh3", "платното")],
@@ -263,9 +265,11 @@ def trail_html(trail: list) -> str:
             f'<div class="bars">{"".join(bars)}</div><div class="regs">{regs}</div>{ends}</div>')
 
 
-def tile_html(v: dict, base: str) -> str:
+def tile_html(v: dict, base: str, week_end: str = "") -> str:
     e = html.escape
-    opt = "".join(f'<a class="opt" href="{base}{h}">{e(lbl)} →</a>' for h, lbl in OPTICS.get(v["id"], []))
+    opt = (f'<a class="opt" href="{base}optika/{week_end}/t{v["id"]}.html" data-optics-door="1">оптиката →</a>'
+           if week_end else "")
+    opt += "".join(f'<a class="opt" href="{base}{h}">{e(lbl)} →</a>' for h, lbl in OPTICS.get(v["id"], []))
     body = []
     if v["state"] == "sivo" and v["why_grey"]:
         body.append(f'<p class="greywhy">сиво: {e(v["why_grey"])}</p>')
@@ -510,7 +514,7 @@ def render(d: dict, base: str, dr: list) -> tuple[str, list]:
         ids = [i for i in sorted(tiles) if next(t for t in d["tiles"] if t["id"] == i).get("row") == key]
         n = {"pazari": "2", "ikonomika": "3", "model": "4"}[key]
         h.append(f'<div class="lbl">{n}. {e(title)}</div><div class="grid" id="row{n}">')
-        h += [tile_html(tiles[i], base) for i in ids]
+        h += [tile_html(tiles[i], base, we) for i in ids]
         h.append('</div>')
         if key == "pazari":
             txt += [f"{n}. " + tline(tiles[i]) if j == 0 else "   " + tline(tiles[i]) for j, i in enumerate(ids)]
@@ -580,6 +584,12 @@ def build(week_end: str, lights: Path | None, out: Path) -> int:
             raise ValueError(f"файлът е за {d.get('week_end')}, не за {week_end}")
         page, txt = render(d, "../", doors(week_end))
         top, _ = render(d, "", doors(week_end))
+        try:  # ИЛЮ5: оптиката зад плочките, за същата седмица и от същия файл
+            import build_optics
+            build_optics.build(week_end, d, out)
+        except Exception as ex:  # noqa: BLE001  стъклото се пише и без оптиката, но ходът е червен
+            print(f"оптиката за {week_end} падна: {type(ex).__name__}: {ex}")
+            rc = 3
     except FileNotFoundError:
         page, txt = broken_page(week_end, "файлът със светлините за седмицата липсва")
         top, rc = page, 2
