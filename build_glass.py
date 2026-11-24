@@ -371,6 +371,13 @@ def doors(week_end: str) -> list:
     e2 = _git_date(DC, "migrations/e2_dashboard/e2.html", f"{sat.isoformat()}T23:59:59Z")
     res.append({"name": "Вратата на кокпита", "href": "file:///C:/Projects/data-core/migrations/e2_dashboard/e2.html",
                 "date": e2})
+    # У8 (ИЛЮ7п): възраст над прага на оптиката (optics_catalog, „tol“) дава белега „застоял“
+    import optics_catalog as oc
+    for x, key in zip(res, ("pulse", "desk", "e2")):
+        tol = (oc.U.get(key) or {}).get("tol")
+        x["tol"] = tol
+        x["age"] = max(0, (fri - dt.date.fromisoformat(x["date"][:10])).days) if x["date"] else None
+        x["stale"] = bool(tol is not None and x["age"] is not None and x["age"] > tol)
     return res
 
 
@@ -426,6 +433,7 @@ display:flex;justify-content:space-between;gap:6px}
 .ab b{font-weight:600}
 .doors{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px}
 .doors span{color:var(--mut)}
+.door-zastoyal a{color:var(--mut)}.doors .zst{color:var(--k);border:1px solid var(--k);border-radius:3px;padding:0 4px}
 .foot{margin-top:18px;font-size:12px;color:var(--mut)}
 .verdict{font-size:14px;margin-top:3px}.verdict b{font-weight:650}
 .areas{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 8px;align-items:center;font-size:12px;color:var(--mut);margin:3px 0}
@@ -539,8 +547,12 @@ def render(d: dict, base: str, dr: list) -> tuple[str, list]:
              f'<a href="{base}vrm.html">моделът</a><a href="{base}sectors.html">секторите</a>')
     for x in dr:
         when = f' <span>последен изход {e(ddmm(x["date"]))}</span>' if x["date"] else ' <span>изход няма</span>'
-        h.append(f'<span><a href="{e(x["href"])}">{e(x["name"])}</a>{when}</span>' if x["href"]
-                 else f'<span>{e(x["name"])}{when}</span>')
+        cls = ''
+        if x.get("stale"):
+            cls = ' class="door-zastoyal"'
+            when = f' <span class="zst">застоял</span> <span>последен изход {e(ddmm(x["date"]))}</span>'
+        h.append(f'<span{cls}><a href="{e(x["href"])}">{e(x["name"])}</a>{when}</span>' if x["href"]
+                 else f'<span{cls}>{e(x["name"])}{when}</span>')
     h.append('</div><p class="foot">Стъклото подрежда файла със светлините на линийката, без своя сметка; '
              'вратите към Пулса, бюрото и кокпита се отварят само на този компютър.</p></div>')
     h.append(f'</div><script>{JS}</script></body></html>')

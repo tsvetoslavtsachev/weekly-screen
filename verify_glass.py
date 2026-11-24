@@ -9,7 +9,8 @@
   път  във видимия текст няма път до файл;
   G6   няма „прогноз“, „препоръ“, „сигнал“;
   ред  текстът е до 20 реда;
-  брой колко числа носи страницата: всички видими числа и отделно без цифрите в имената.
+  брой колко числа носи страницата: всички видими числа и отделно без цифрите в имената;
+  таван без цифрите в имената най-много MAX_NUMBERS (60, Ц. 22.11.2026), над него е червено.
 
   python verify_glass.py --week-end 2026-11-20 [--out-dir ПАПКА] [--lights ФАЙЛ]
 Изход 0: всичко минава; 1: нещо не минава (печата кое, най-много 30 реда).
@@ -130,6 +131,11 @@ def check_numbers(text: str, d, nums, strs, dates, where: str) -> tuple[list, in
     return bad, n_all, n_data
 
 
+# Ж1 (ИЛЮ7п, 23.11.2026): таванът на първата страница от брифа на стъклото (ИЛЮ4, „Първата
+# страница се разтоварва“, решено от Ц. на 22.11.2026). Броят е без цифрите в имената.
+MAX_NUMBERS = 60
+
+
 def verify(week_end: str, out: Path, lights: Path | None) -> int:
     lights = lights or bg.LIGHTS_DIR / f"ilu_lights_{week_end}.json"
     d = json.loads(lights.read_text(encoding="utf-8"))
@@ -170,6 +176,8 @@ def verify(week_end: str, out: Path, lights: Path | None) -> int:
         bad.append(f"текстът е {len(lines)} реда, над 20")
     total = n_all + len(door_found) + len(ch_dates)
     total_data = n_data + len(door_found) + len(ch_dates)
+    if total_data > MAX_NUMBERS:
+        bad.append(f"таван: без цифрите в имената {total_data} числа, над {MAX_NUMBERS}")
     print(f"{week_end}: числа на стъклото {total} (без цифрите в имената {total_data}); "
           f"в зоната на светлините {n_all}, проверени срещу файла; вратите {len(door_found)}; "
           f"текстът {len(lines)} реда, {t_all} числа")

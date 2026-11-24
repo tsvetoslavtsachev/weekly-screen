@@ -101,3 +101,39 @@ def test_g6_and_no_paths(week, tmp_path):
     for w in vg.BANNED:
         assert w not in vis
     assert not re.search(r"[a-z]:\\|[a-z]:/", vis)
+
+
+def test_u8_stale_door_is_marked_like_optics(tmp_path, monkeypatch):
+    """ИЛЮ7п, У8: вратата към уред над прага на оптиката носи белега „застоял“ (бюрото, 06.11)."""
+    import optics_catalog as oc
+    bg.build("2026-11-20", lights("2026-11-20"), tmp_path)
+    page = (tmp_path / "staklo" / "2026-11-20.html").read_text(encoding="utf-8")
+    spans = re.findall(r'<span( class="door-zastoyal")?><a href="[^"]*">([^<]*)</a>(.*?)</span>\s*(?=<span|</div>)', page, re.S)
+    by = {name: (bool(cls), rest) for cls, name, rest in spans}
+    desk = by["Бюрото, първата страница"]
+    assert desk[0] and "застоял" in desk[1], desk
+    assert not by["Пулсът, дайджестът"][0]
+    # мутация: прагът на бюрото над възрастта му -> белегът изчезва
+    monkeypatch.setitem(oc.U["desk"], "tol", 400)
+    bg.build("2026-11-20", lights("2026-11-20"), tmp_path / "m")
+    page = (tmp_path / "m" / "staklo" / "2026-11-20.html").read_text(encoding="utf-8")
+    assert 'class="door-zastoyal"' not in page
+
+
+def test_zh1_cap_60_numbers_is_a_check(tmp_path, capsys):
+    """ИЛЮ7п, Ж1: таванът от 60 числа на първата страница (Ц., 22.11.2026) е проверка, не броене.
+    Мутация: повтаряме едно вярно число от файла в зоната на светлините, докато станат 61."""
+    week = "2026-11-20"
+    bg.build(week, lights(week), tmp_path)
+    assert vg.verify(week, tmp_path, lights(week)) == 0
+    n = int(re.search(r"без цифрите в имената (\d+)", capsys.readouterr().out).group(1))
+    assert n <= 60
+    p = tmp_path / "staklo" / f"{week}.html"
+    s = p.read_text(encoding="utf-8")
+    extra = " −8,56%" * (61 - n)
+    s2, k = re.subn(r"−8,56%", "−8,56%" + extra, s, count=1)
+    assert k == 1
+    p.write_text(s2, encoding="utf-8")
+    assert vg.verify(week, tmp_path, lights(week)) == 1
+    out = capsys.readouterr().out
+    assert "без цифрите в имената 61" in out and re.search(r"НЕ: .*61.*60", out), out
