@@ -1,5 +1,5 @@
 {
- "as_of": "2026-11-21",
+ "as_of": "2026-11-28",
  "n_storms": 1,
  "storms": [
   {
@@ -8,9 +8,9 @@
    "says": "Режимът Рефлация стои, но основите му се изместват — лещите, подкрепата и цените говорят за еволюция към нещо друго.",
    "born": "2026-07-12",
    "status": "active",
-   "as_of": "2026-11-21",
-   "age_days": 132,
-   "n_hold": 4,
+   "as_of": "2026-11-28",
+   "age_days": 139,
+   "n_hold": 3,
    "n_total": 5,
    "conditions": [
     {
@@ -66,7 +66,7 @@
      "core": false,
      "link": "https://tsvetoslavtsachev.github.io/ai-hype-monitor/",
      "lies_when": "данните дишат със SEC-ритъма (~45д лаг) — числото застоява между подавания",
-     "holds": true
+     "holds": false
     }
    ],
    "falsifier": "Режимът се сменя (c1 пада 2 поредни съботи) ИЛИ ≥2 лещи се изравнят с рефлацията ИЛИ подкрепата се разшири до ≥4 твърди гласа.",
@@ -75,10 +75,10 @@
     "c2": 0
    },
    "baseline_down_streak": {
-    "c1": 9,
+    "c1": 0,
     "c2": 0
    },
-   "baseline_status": "inactive"
+   "baseline_status": "active"
   }
  ]
 }
